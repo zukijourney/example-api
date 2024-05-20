@@ -15,21 +15,6 @@ class AIModel:
     type: str = "chat.completions"
     providers: list = field(default_factory=list)
 
-    @classmethod
-    def __all__(cls):
-        """Returns a list of all available AI models"""
-        return list(AIModels.models)
-
-    @classmethod
-    def __contains__(cls, item: str):
-        """Checks if an item is in the list of available AI models"""
-        return item in cls.__all__()
-
-    @classmethod
-    def __getitem__(cls, model: str):
-        """Returns the AI model with the given ID"""
-        return AIModels.models.get(model)
-
     def to_json(self, full: bool = True):
         """Returns a JSON representation of the available AI models (and providers if specified)"""
         model_object = self.__dict__.copy()

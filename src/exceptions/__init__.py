@@ -1,4 +1,5 @@
 from typing import Optional, Union
+from starlette.exceptions import HTTPException
 from ..responses import PrettyJSONResponse
 
 def get_exception_type(etype: Union[Exception, str]):
@@ -14,9 +15,6 @@ class BaseError(Exception):
         self.code = code
         self.status = status
 
-    def __str__(self):
-        return str(self.to_dict())
-
     def to_dict(self):
         return {"error": {"message": self.message, "type": self.type, "param": self.param, "code": self.code}}
 
@@ -25,9 +23,6 @@ class BaseError(Exception):
 
     def to_response(self):
         return PrettyJSONResponse(content=self.to_dict(), status_code=self.status)
-
-class RateLimitException(BaseError):
-    pass
 
 class InvalidRequestException(BaseError):
     pass

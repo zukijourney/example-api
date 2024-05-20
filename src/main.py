@@ -8,8 +8,14 @@ from .middlewares import configure_middlewares
 app = Starlette(
     routes=routes,
     exception_handlers=configure_error_handlers(),
-    middleware=[Middleware(CORSMiddleware, allow_origins=["*"], allow_headers=["*"], allow_methods=["*"])],
-    debug=True
+    middleware=[
+        Middleware(
+            CORSMiddleware,
+            allow_origins=["*"],
+            allow_headers=["*"],
+            allow_methods=["*"]
+        )
+    ]
 )
 
 configure_middlewares(app)

@@ -2,7 +2,7 @@ from starlette.requests import Request
 from ..exceptions import InvalidRequestException
 from ..utils import AIModel
 
-all_models = [model['id'] for model in AIModel.get_all_models() if model['type'] == 'chat.completions']
+all_models = [model["id"] for model in AIModel.get_all_models() if model["type"] == "chat.completions"]
 
 async def chat(request: Request):
     """Chat endpoint request handler"""

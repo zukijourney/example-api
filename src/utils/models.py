@@ -43,9 +43,8 @@ class AIModel:
 
     @classmethod
     def get_all_models(cls):
-        """Returns a random AI model from the list of available AI models"""
-        models = cls.all_to_json()
-        return [model for model in models["data"]]
+        """Returns a list of all available AI models IDs"""
+        return [model for model in cls.all_to_json()["data"]]
 
     @classmethod
     def get_provider_for_model(cls, model: str):
@@ -74,16 +73,8 @@ class AIModels(metaclass=AIModelMeta):
         id="gpt-4-turbo",
         providers=[OpenAI.chat]
     )
-    gpt_4_turbo_2024_04_09 = AIModel(
-        id="gpt-4-turbo-2024-04-09",
-        providers=[OpenAI.chat]
-    )
     gpt_4_turbo_preview = AIModel(
         id="gpt-4-turbo-preview",
-        providers=[OpenAI.chat]
-    )
-    gpt_4_0125_preview = AIModel(
-        id="gpt-4-0125-preview",
         providers=[OpenAI.chat]
     )
     gpt_4_1106_preview = AIModel(

@@ -1,8 +1,8 @@
 import openai
 import random
-from starlette.responses import StreamingResponse
 from ..storage import KeyManager
 from ..responses import PrettyJSONResponse, streaming_chat_response, normal_chat_response
+from ..exceptions import InvalidResponseException
 
 class OpenAI:
     """
@@ -18,10 +18,16 @@ class OpenAI:
     @classmethod
     async def chat(cls, body: dict):
         """Performs a chat completion request"""
-        client = openai.AsyncOpenAI(api_key=(await cls.get_random_key()))
-        response = await client.chat.completions.create(**body)
-        return StreamingResponse(streaming_chat_response(response, body)) if body.get("stream") \
-            else PrettyJSONResponse(await normal_chat_response(response.choices[0].message.content, body))
+        try:
+            client = openai.AsyncOpenAI(api_key=(await cls.get_random_key()))
+            response = await client.chat.completions.create(**body)
+            return await streaming_chat_response(response, body) if body.get("stream") \
+                else PrettyJSONResponse(await normal_chat_response(response.choices[0].message.content, body))
+        except:
+            return InvalidResponseException(
+                message="We were unable to generate a response. Please try again later.",
+                status=500
+            ).to_response()
 
     @classmethod
     async def image(cls, body: dict):

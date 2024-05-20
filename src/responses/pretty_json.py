@@ -2,6 +2,10 @@ from starlette.responses import Response
 import ujson
 
 class PrettyJSONResponse(Response):
+    """
+    Class for easily creating pretty JSON responses.
+    """
+
     media_type = "application/json"
 
     def render(self, content: dict | list):

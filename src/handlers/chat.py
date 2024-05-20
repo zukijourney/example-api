@@ -18,4 +18,4 @@ async def chat(data: ChatBody) -> Stream | PrettyJSONResponse:
             status=404
         ).to_response()
 
-    return await (AIModel.get_provider_for_model(data.model))(data.__dict__.copy())
+    return await (AIModel.get_random_provider(data.model))(data.__dict__.copy())

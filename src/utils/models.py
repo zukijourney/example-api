@@ -1,6 +1,5 @@
 from dataclasses import dataclass, field
 from ..providers import OpenAI
-import random
 
 @dataclass
 class AIModel:
@@ -14,9 +13,10 @@ class AIModel:
     owned_by: str = "openai"
     type: str = "chat.completions"
     providers: list = field(default_factory=list)
+    _provider_index: int = field(default=0, init=False, repr=False)
 
-    def to_json(self, full: bool = True):
-        """Returns a JSON representation of the available AI models (and providers if specified)"""
+    def to_json(self, full: bool = False):
+        """Returns a JSON representation of an AI model (and its provider if specified)"""
         model_object = self.__dict__.copy()
         del model_object["providers"]
         return {"object": "model", "data": model_object} if full else model_object
@@ -24,7 +24,7 @@ class AIModel:
     @classmethod
     def all_to_json(cls):
         """Returns a JSON representation of the list of available AI models"""
-        return {"object": "list", "data": [model.to_json(full=False) for model in AIModels.models.values()]}
+        return {"object": "list", "data": [model.to_json() for model in AIModels.models.values()]}
 
     @classmethod
     def get_all_models(cls):
@@ -32,9 +32,12 @@ class AIModel:
         return [model for model in cls.all_to_json()["data"]]
 
     @classmethod
-    def get_provider_for_model(cls, model: str):
-        """Returns a random provider for the given AI model"""
-        return random.choice(AIModels.models.get(model).providers)
+    def get_random_provider(cls, model: str):
+        """Returns a provider for the given AI model using round-robin load balancing"""
+        ai_model = AIModels.models[model]
+        provider = ai_model.providers[ai_model._provider_index]
+        ai_model._provider_index = (ai_model._provider_index + 1) % len(ai_model.providers)
+        return provider
 
 class AIModelMeta(type):
     """

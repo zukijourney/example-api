@@ -1,7 +1,7 @@
 from litestar import Request
 from ..typings import ImageBody, ChatBody, AdminBody
 
-typing_map = {
+endpoint_classes = {
     "/v1/images/generations": ImageBody,
     "/v1/chat/completions": ChatBody,
     "/admin": AdminBody
@@ -10,4 +10,4 @@ typing_map = {
 async def body_validator(request: Request):
     """Validates the request body"""
     body = await request.json()
-    typing_map[request.url.path](**body).validate()
+    endpoint_classes[request.url.path](**body).validate()

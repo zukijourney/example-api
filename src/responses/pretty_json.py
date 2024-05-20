@@ -3,7 +3,7 @@ import ujson
 
 class PrettyJSONResponse(Response):
     """
-    Class for easily creating pretty JSON responses.
+    Class for easily creating pretty JSON responses
     """
 
     media_type = "application/json"

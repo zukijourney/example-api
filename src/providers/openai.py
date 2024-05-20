@@ -19,14 +19,14 @@ class OpenAI:
         return chosen_key
 
     @classmethod
-    async def chat(cls, body: dict):
+    async def chat_completion(cls, body: dict):
         """Performs a chat completion request"""
         try:
             client = openai.AsyncOpenAI(api_key=(await cls.get_random_key()))
             response = await client.chat.completions.create(**body)
             return await streaming_chat_response(response, body) if body.get("stream") \
                 else PrettyJSONResponse(await normal_chat_response(response.choices[0].message.content, body))
-        except:
+        except Exception:
             return InvalidResponseException(
                 message="We were unable to generate a response. Please try again later.",
                 status=500

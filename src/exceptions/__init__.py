@@ -17,7 +17,7 @@ class BaseError(Exception):
     def to_dict(self):
         return {"error": {"message": self.message, "type": self.type, "param": self.param, "code": self.code}}
 
-    async def _handler(self, **_):
+    def error_handler(self, **_):
         return PrettyJSONResponse(content=self.to_dict(), status_code=self.status)
 
     def to_response(self):

@@ -32,9 +32,9 @@ def configure_error_handlers():
         404: status_404_handler,
         405: status_405_handler,
         Exception: exception_handler,
-        BaseError: BaseError._handler,
-        InvalidRequestException: InvalidRequestException._handler,
-        InvalidResponseException: InvalidResponseException._handler,
+        BaseError: BaseError.error_handler,
+        InvalidRequestException: InvalidRequestException.error_handler,
+        InvalidResponseException: InvalidResponseException.error_handler,
         HTTPException: http_exception_handler,
         ValueError: value_error_handler
     }

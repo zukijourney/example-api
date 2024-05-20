@@ -11,10 +11,14 @@ async def streaming_chat_response(response: AsyncStream[ChatCompletionChunk] | s
     try:
         """Streaming response generator"""
 
+        completion_id = gen_cmpl_id()
+        fingerprint = gen_sys_fp()
+
         def generate_chunk(chunk: str):
             return {
-                "id": f"chatcmpl-{gen_cmpl_id()}",
+                "id": f"chatcmpl-{completion_id}",
                 "object": "chat.completion",
+                "system_fingerprint": fingerprint,
                 "created": time.time(),
                 "model": data.get("model"),
                 "choices": [{"index": 0, "delta": {"role": "assistant", "content": chunk}, "finish_reason": "stop"}]

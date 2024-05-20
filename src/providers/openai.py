@@ -1,5 +1,4 @@
 import openai
-import random
 from ..database import KeyManager
 from ..responses import PrettyJSONResponse, streaming_chat_response, normal_chat_response
 from ..exceptions import InvalidResponseException
@@ -9,11 +8,15 @@ class OpenAI:
     Example OpenAI provider
     """
 
+    _key_index = 0
+
     @classmethod
     async def get_random_key(cls):
-        """Returns a random OpenAI key from the database"""
+        """Returns a random OpenAI key from the database using round-robin load balancing"""
         keys = await KeyManager.get_keys("openai")
-        return random.choice(keys)
+        chosen_key = keys[cls._key_index]
+        cls._key_index = (cls._key_index + 1) % len(keys)
+        return chosen_key
 
     @classmethod
     async def chat(cls, body: dict):

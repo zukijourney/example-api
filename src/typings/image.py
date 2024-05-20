@@ -14,6 +14,7 @@ class ImageBody:
     n: int = 1
 
     def validate(self):
+        """Validates the body"""
         for field_name, field_type in self.__annotations__.items():
             value = getattr(self, field_name)
             origin = get_origin(field_type)

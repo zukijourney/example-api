@@ -1,5 +1,4 @@
 from typing import Optional, Union
-from starlette.exceptions import HTTPException
 from ..responses import PrettyJSONResponse
 
 def get_exception_type(etype: Union[Exception, str]):

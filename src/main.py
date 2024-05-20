@@ -1,21 +1,10 @@
-from starlette.applications import Starlette
-from starlette.middleware import Middleware
-from starlette.middleware.cors import CORSMiddleware
+from litestar import Litestar
+from litestar.config.cors import CORSConfig
 from .utils import configure_error_handlers
 from .handlers import routes
-from .middlewares import configure_middlewares
 
-app = Starlette(
-    routes=routes,
+app = Litestar(
+    route_handlers=routes,
     exception_handlers=configure_error_handlers(),
-    middleware=[
-        Middleware(
-            CORSMiddleware,
-            allow_origins=["*"],
-            allow_headers=["*"],
-            allow_methods=["*"]
-        )
-    ]
+    cors_config=CORSConfig(max_age=3600),
 )
-
-configure_middlewares(app)

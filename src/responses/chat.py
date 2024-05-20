@@ -1,6 +1,6 @@
 import time
 import ujson
-from starlette.responses import StreamingResponse
+from litestar.response import Stream
 from openai import AsyncStream
 from openai.types.chat import ChatCompletionChunk
 from ..exceptions import InvalidResponseException
@@ -11,7 +11,7 @@ async def streaming_chat_response(response: AsyncStream[ChatCompletionChunk] | s
     try:
         """Streaming response generator"""
 
-        def generate_response(chunk: str):
+        def generate_chunk(chunk: str):
             return {
                 "id": f"chatcmpl-{gen_cmpl_id()}",
                 "object": "chat.completion",
@@ -24,14 +24,14 @@ async def streaming_chat_response(response: AsyncStream[ChatCompletionChunk] | s
             try:
                 if isinstance(response, str):
                     for chunk in response:
-                        yield b"data: " + ujson.dumps(generate_response(chunk)).encode("utf-8") + b"\n\n"
+                        yield b"data: " + ujson.dumps(generate_chunk(chunk)).encode("utf-8") + b"\n\n"
                 else:
                     async for chunk in response:
                         yield b"data: " + chunk.model_dump_json().encode("utf-8") + b"\n\n"
             finally:
                 yield b"data: [DONE]"
 
-        return StreamingResponse(generate_response(response))
+        return Stream(generate_response(response), media_type="text/event-stream", status_code=200)
     except:
         return InvalidResponseException(
             message="We were unable to generate a response. Please try again later.",

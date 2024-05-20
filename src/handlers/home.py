@@ -1,6 +1,7 @@
-from starlette.requests import Request
+from litestar import get
 from ..responses import PrettyJSONResponse
 
-async def home(_: Request):
+@get("/")
+async def home() -> PrettyJSONResponse:
     """Home endpoint request handler"""
     return PrettyJSONResponse({"message": "Welcome to the Zukijourney example API!"})

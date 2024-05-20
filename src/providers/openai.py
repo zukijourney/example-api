@@ -1,6 +1,6 @@
 import openai
 import random
-from ..storage import KeyManager
+from ..database import KeyManager
 from ..responses import PrettyJSONResponse, streaming_chat_response, normal_chat_response
 from ..exceptions import InvalidResponseException
 
@@ -34,4 +34,4 @@ class OpenAI:
         """Performs an image generation request"""
         client = openai.AsyncOpenAI(api_key=(await cls.get_random_key()))
         response = await client.images.generate(**body)
-        return PrettyJSONResponse(response.model_dump())
+        return PrettyJSONResponse(response.model_dump(), status_code=200)

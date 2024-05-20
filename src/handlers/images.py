@@ -1,18 +1,20 @@
-from starlette.requests import Request
+from litestar import post
 from ..exceptions import InvalidRequestException
-from ..utils import AIModel
+from ..guards import auth_guard
+from ..typings import ImageBody
+from ..utils import AIModel, body_validator
+from ..responses import PrettyJSONResponse
 
 all_models = [model["id"] for model in AIModel.get_all_models() if model["type"] == "images.generations"]
 
-async def images(request: Request):
+@post("/v1/images/generations", guards=[auth_guard], before_request=body_validator)
+async def images(data: ImageBody) -> PrettyJSONResponse:
     """Image endpoint request handler"""
 
-    body = await request.json()
-
-    if body.get("model") not in all_models:
+    if data.model not in all_models:
         return InvalidRequestException(
-            message=f"Model {body.get('model')} not found.",
+            message=f"Model {data.model} not found.",
             status=404
         ).to_response()
 
-    return await (AIModel.get_provider_for_model(body.get("model")))(body)
+    return await (AIModel.get_provider_for_model(data.model))(data.__dict__.copy())

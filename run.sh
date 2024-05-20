@@ -1,0 +1,1 @@
+python3 -B -m uvicorn src.main:app --reload

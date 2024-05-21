@@ -16,7 +16,7 @@ class ChatBody:
     presence_penalty: Union[float, int] = 0
     frequency_penalty: Union[float, int] = 0
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates the body"""
         for field_name, field_type in self.__annotations__.items():
             value = getattr(self, field_name)

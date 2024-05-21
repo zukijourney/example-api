@@ -3,7 +3,7 @@ from litestar.handlers.base import BaseRouteHandler
 from litestar.exceptions import HTTPException
 from ..database import UserManager
 
-async def auth_guard(connection: ASGIConnection, _: BaseRouteHandler):
+async def auth_guard(connection: ASGIConnection, _: BaseRouteHandler) -> None:
     """Authentication guard (executes before the route handler)"""
 
     key = connection.headers.get("Authorization", "").replace("Bearer ", "", 1)

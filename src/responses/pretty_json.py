@@ -10,7 +10,7 @@ class PrettyJSONResponse(Response):
     media_type = "application/json"
     status_code = 200
 
-    def render(self, content: Union[dict, list], *_):
+    def render(self, content: Union[dict, list], *_) -> bytes:
         """Renders the given dict or list as an indented bytes object"""
         return ujson.dumps(
             obj=content,

@@ -16,7 +16,7 @@ rate_spec_map = {
     "premium": RateSpec(requests=10, seconds=60),
 }
 
-async def ratelimit_guard(connection: ASGIConnection, _: BaseRouteHandler):
+async def ratelimit_guard(connection: ASGIConnection, _: BaseRouteHandler) -> None:
     """Rate limiting guard (executes before the route handler)"""
 
     key = connection.headers.get("Authorization", "").replace("Bearer ", "", 1)

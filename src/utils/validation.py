@@ -1,8 +1,10 @@
 from litestar import Request
+from typing import Union
 from .errors import InvalidRequestException
 from .models import AIModel
 from ..database import UserManager
 from ..typings import ImageBody, ChatBody, AdminBody
+from ..responses import PrettyJSONResponse
 
 endpoint_classes = {
     "/v1/images/generations": ImageBody,
@@ -10,7 +12,7 @@ endpoint_classes = {
     "/admin": AdminBody
 }
 
-async def body_validator(request: Request):
+async def body_validator(request: Request) -> Union[None, PrettyJSONResponse]:
     """Request body validator (before request hook)"""
 
     body = await request.json()

@@ -1,5 +1,6 @@
 import time
 import ujson
+from collections.abc import AsyncGenerator
 from litestar.response import Stream
 from openai import AsyncStream
 from openai.types.chat import ChatCompletionChunk
@@ -8,7 +9,7 @@ from ..exceptions import InvalidResponseException
 from . import PrettyJSONResponse
 from ..utils import gen_system_fingerprint, gen_completion_id
 
-def generate_chunk(chunk: str, model: str):
+def generate_chunk(chunk: str, model: str) -> dict:
     return {
         "id": f"chatcmpl-{gen_system_fingerprint()}",
         "object": "chat.completion",
@@ -18,7 +19,7 @@ def generate_chunk(chunk: str, model: str):
         "choices": [{"index": 0, "delta": {"role": "assistant", "content": chunk}, "finish_reason": "stop"}]
     }
 
-async def generate_response(response: Union[AsyncStream[ChatCompletionChunk], str], data: dict):
+async def generate_response(response: Union[AsyncStream[ChatCompletionChunk], str], data: dict) -> AsyncGenerator[bytes]:
     try:
         if isinstance(response, str):
             for chunk in response:
@@ -29,7 +30,7 @@ async def generate_response(response: Union[AsyncStream[ChatCompletionChunk], st
     finally:
         yield b"data: [DONE]"
 
-async def streaming_chat_response(response: Union[AsyncStream[ChatCompletionChunk], str], data: dict):
+async def streaming_chat_response(response: Union[AsyncStream[ChatCompletionChunk], str], data: dict) -> Stream:
     """Streaming response generator"""
     try:
         return Stream(generate_response(response, data), media_type="text/event-stream", status_code=200)
@@ -39,7 +40,7 @@ async def streaming_chat_response(response: Union[AsyncStream[ChatCompletionChun
             status=500
         ).to_response()
 
-async def normal_chat_response(response: str, data: dict):
+async def normal_chat_response(response: str, data: dict) -> PrettyJSONResponse:
     """Non-streaming response generator"""
 
     return PrettyJSONResponse({

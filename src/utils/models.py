@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from typing import Dict, Any, List, Coroutine
 from ..providers import OpenAI
 
 @dataclass
@@ -16,24 +17,24 @@ class AIModel:
     providers: list = field(default_factory=list)
     _provider_index: int = field(default=0, init=False, repr=False)
 
-    def to_json(self, full: bool = True):
+    def to_json(self, full: bool = True) -> Dict[str, Any]:
         """Returns a JSON representation of an AI model (and its provider if specified)"""
         model_object = self.__dict__.copy()
         del model_object["providers"]
         return model_object if not full else self.__dict__.copy()
 
     @classmethod
-    def all_to_json(cls):
+    def all_to_json(cls) -> Dict[str, Any]:
         """Returns a JSON representation of the list of available AI models"""
         return {"object": "list", "data": [model.to_json(False) for model in AIModels.models.values()]}
 
     @classmethod
-    def get_all_models(cls, type: str = "chat.completions", premium: bool = False):
+    def get_all_models(cls, type: str = "chat.completions", premium: bool = False) -> List[str]:
         """Returns a list of all available AI models IDs"""
         return [model["id"] for model in cls.all_to_json()["data"] if model["type"] == type and model["premium"] == premium]
 
     @classmethod
-    def get_random_provider(cls, model: str):
+    def get_random_provider(cls, model: str) -> Coroutine[Any, Any, Any]:
         """Returns a provider for the given AI model using round-robin load balancing"""
         ai_model = AIModels.models[model]
         provider = ai_model.providers[ai_model._provider_index]

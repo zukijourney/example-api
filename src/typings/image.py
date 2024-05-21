@@ -13,7 +13,7 @@ class ImageBody:
     size: str = "1024x1024"
     n: int = 1
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates the body"""
         for field_name, field_type in self.__annotations__.items():
             value = getattr(self, field_name)

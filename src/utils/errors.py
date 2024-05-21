@@ -1,10 +1,11 @@
 import traceback
+from typing import Dict, Union
 from litestar import Request
 from litestar.exceptions import HTTPException
 from ..responses import PrettyJSONResponse
 from ..exceptions import BaseError, InvalidRequestException, InvalidResponseException
 
-def configure_error_handlers():
+def configure_error_handlers() -> Dict[Union[int, Exception], PrettyJSONResponse]:
     """Sets up all error handlers"""
 
     def status_404_handler(request: Request, _: Exception) -> PrettyJSONResponse:

@@ -1,4 +1,6 @@
 import openai
+from typing import Union
+from litestar.response import Stream
 from ..database import KeyManager
 from ..responses import PrettyJSONResponse, streaming_chat_response, normal_chat_response
 from ..exceptions import InvalidResponseException
@@ -19,7 +21,7 @@ class OpenAI:
         return chosen_key
 
     @classmethod
-    async def chat_completion(cls, body: dict):
+    async def chat_completion(cls, body: dict) -> Union[PrettyJSONResponse, Stream]:
         """Performs a chat completion request"""
         try:
             client = openai.AsyncOpenAI(api_key=(await cls.get_random_key()))
@@ -33,7 +35,7 @@ class OpenAI:
             ).to_response()
 
     @classmethod
-    async def image(cls, body: dict):
+    async def image(cls, body: dict) -> PrettyJSONResponse:
         """Performs an image generation request"""
         client = openai.AsyncOpenAI(api_key=(await cls.get_random_key()))
         response = await client.images.generate(**body)

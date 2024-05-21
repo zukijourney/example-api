@@ -1,4 +1,4 @@
-from typing import get_args, get_origin
+from typing import get_args
 from dataclasses import dataclass
 from collections.abc import Iterable
 
@@ -13,7 +13,7 @@ class AdminBody:
     status: bool = False
     property: str = ""
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates the body"""
         for field_name, field_type in self.__annotations__.items():
             value = getattr(self, field_name)

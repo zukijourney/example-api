@@ -4,7 +4,7 @@ from litestar.exceptions import HTTPException
 from ..database import UserManager
 
 async def auth_guard(connection: ASGIConnection, _: BaseRouteHandler):
-    key = connection.headers.get("Authorization", "").replace("Bearer ", "")
+    key = connection.headers.get("Authorization", "").replace("Bearer ", "", 1)
 
     if key == "":
         raise HTTPException("Missing authorization header.", status_code=401)

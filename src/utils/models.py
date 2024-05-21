@@ -11,7 +11,7 @@ class AIModel:
     object: str = "model"
     created: int = 0
     owned_by: str = "openai"
-    type: str = "chat_completion.completions"
+    type: str = "chat.completions"
     providers: list = field(default_factory=list)
     _provider_index: int = field(default=0, init=False, repr=False)
 
@@ -53,40 +53,17 @@ class AIModels(metaclass=AIModelMeta):
     Class for registering AI models
     """
 
-    gpt_4_o = AIModel(
-        id="gpt-4o",
-        providers=[OpenAI.chat_completion]
-    )
-    gpt_4_turbo = AIModel(
-        id="gpt-4-turbo",
-        providers=[OpenAI.chat_completion]
-    )
-    gpt_4_turbo_preview = AIModel(
-        id="gpt-4-turbo-preview",
-        providers=[OpenAI.chat_completion]
-    )
-    gpt_4_1106_preview = AIModel(
-        id="gpt-4-1106-preview",
-        providers=[OpenAI.chat_completion]
-    )
-    gpt_4 = AIModel(
-        id="gpt-4",
-        providers=[OpenAI.chat_completion]
-    )
-    gpt_35_turbo_0125 = AIModel(
-        id="gpt-3.5-turbo-0125",
-        providers=[OpenAI.chat_completion]
-    )
-    gpt_35_turbo_1106 = AIModel(
-        id="gpt-3.5-turbo-1106",
-        providers=[OpenAI.chat_completion]
-    )
-    gpt_35_turbo = AIModel(
-        id="gpt-3.5-turbo",
-        providers=[OpenAI.chat_completion]
-    )
-    dalle_3 = AIModel(
-        id="dall-e-3",
-        providers=[OpenAI.image],
-        type="images.generations"
-    )
+    model_data = [
+        ("gpt-4o", "model", 0, "openai", "chat.completions", [OpenAI.chat_completion]),
+        ("gpt-4-turbo", "model", 0, "openai", "chat.completions", [OpenAI.chat_completion]),
+        ("gpt-4-turbo-preview", "model", 0, "openai", "chat.completions", [OpenAI.chat_completion]),
+        ("gpt-4-1106-preview", "model", 0, "openai", "chat.completions", [OpenAI.chat_completion]),
+        ("gpt-4", "model", 0, "openai", "chat.completions", [OpenAI.chat_completion]),
+        ("gpt-3.5-turbo-0125", "model", 0, "openai", "chat.completions", [OpenAI.chat_completion]),
+        ("gpt-3.5-turbo-1106", "model", 0, "openai", "chat.completions", [OpenAI.chat_completion]),
+        ("gpt-3.5-turbo", "model", 0, "openai", "chat.completions", [OpenAI.chat_completion]),
+        ("dall-e-3", "model", 0, "openai", "images.generations", [OpenAI.image])
+    ]
+
+    for model_id, *args in model_data:
+        locals()[model_id.replace("-", "_")] = AIModel(model_id, *args)

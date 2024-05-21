@@ -14,7 +14,7 @@ async def admin(request: Request, data: AdminBody) -> PrettyJSONResponse:
 
     authorization = request.headers.get("Authorization")
 
-    if authorization.replace("Bearer ", "") != config["adminKey"]:
+    if authorization.replace("Bearer ", "", 1) != config["adminKey"]:
         return PrettyJSONResponse(
             content={"error": "Invalid admin key.", "success": False},
             status_code=401

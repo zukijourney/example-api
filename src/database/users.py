@@ -1,6 +1,6 @@
 import ujson
 from pymongo import MongoClient
-from typing import Literal, Union
+from typing import Literal, Union, Dict
 from asgiref.sync import sync_to_async
 from ..utils import gen_random_string
 
@@ -29,7 +29,7 @@ class UserManager:
         return
 
     @classmethod
-    async def get_user_by_id(cls, user_id: int) -> Union[str, None]:
+    async def get_user_by_id(cls, user_id: int) -> Union[Dict[str, Union[str, bool]], None]:
         """Returns an user by its ID"""
         user = await sync_to_async(cls.db.find_one)({"id": str(user_id)})
         return user.get("key") if user else None

@@ -1,5 +1,6 @@
 import pymongo
 import ujson
+from typing import Literal
 from asgiref.sync import sync_to_async
 from ..utils import gen_random_string
 
@@ -40,13 +41,13 @@ class UserManager:
         return user
     
     @classmethod
-    async def get_property(cls, key: str, property: str):
+    async def get_property(cls, key: str, property: Literal["premium", "banned"]):
         """Gets an user's property (premium or banned)"""
         user = await sync_to_async(cls.db.find_one)({"key": key})
         return user.get(property) if user else None
     
     @classmethod
-    async def set_property(cls, user_id: int, property: str, value: bool):
+    async def set_property(cls, user_id: int, property: Literal["premium", "banned"], value: bool):
         """Updates an user's property (premium or banned)"""
         await sync_to_async(cls.db.find_one_and_update)({"id": str(user_id)}, {"$set": {property: value}})
         return

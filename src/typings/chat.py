@@ -27,7 +27,6 @@ class ChatBody:
                 if not any(isinstance(value, arg) for arg in args):
                     raise ValueError(f"{field_name} must be one of {args}")
             elif isinstance(value, Iterable) and origin:
-                print(args)
                 if not all(isinstance(item, args[0]) for item in value):
                     raise ValueError(f"All items in {field_name} must be of type {args[0]}")
             elif not isinstance(value, field_type):

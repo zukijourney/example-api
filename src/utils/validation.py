@@ -11,10 +11,11 @@ endpoint_classes = {
 }
 
 async def body_validator(request: Request):
-    """Validates the request body"""
+    """Request body validator (before request hook)"""
 
     body = await request.json()
     key = request.headers.get("Authorization", "").replace("Bearer ", "", 1)
+
     endpoint_classes[request.url.path](**body).validate()
 
     if request.url.path == "/admin":

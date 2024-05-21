@@ -12,6 +12,8 @@ redis = Redis.from_url(config["redisURI"])
 rate_spec = RateSpec(requests=5, seconds=60)
 
 async def ratelimit_guard(connection: ASGIConnection, _: BaseRouteHandler):
+    """Rate limiting guard (executes before the route handler)"""
+
     key = connection.headers.get("Authorization", "").replace("Bearer ", "", 1)
 
     try:

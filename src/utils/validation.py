@@ -1,5 +1,5 @@
 from litestar import Request
-from typing import Union
+from typing import Optional
 from .errors import InvalidRequestException
 from .models import AIModel
 from ..database import UserManager
@@ -12,7 +12,7 @@ endpoint_classes = {
     "/admin": AdminBody
 }
 
-async def body_validator(request: Request) -> Union[None, PrettyJSONResponse]:
+async def body_validator(request: Request) -> Optional[PrettyJSONResponse]:
     """Request body validator (before request hook)"""
 
     body = await request.json()

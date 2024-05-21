@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Dict, Any, List, Coroutine
+from typing import Dict, Any, List, Coroutine, Union
 from ..providers import OpenAI
 
 @dataclass
@@ -17,14 +17,14 @@ class AIModel:
     providers: list = field(default_factory=list)
     _provider_index: int = field(default=0, init=False, repr=False)
 
-    def to_json(self, full: bool = True) -> Dict[str, Any]:
+    def to_json(self, full: bool = True) -> Dict[str, Union[str, int, list, bool]]:
         """Returns a JSON representation of an AI model (and its provider if specified)"""
         model_object = self.__dict__.copy()
         del model_object["providers"]
         return model_object if not full else self.__dict__.copy()
 
     @classmethod
-    def all_to_json(cls) -> Dict[str, Any]:
+    def all_to_json(cls) -> Dict[str, Union[str, int, bool]]:
         """Returns a JSON representation of the list of available AI models"""
         return {"object": "list", "data": [model.to_json(False) for model in AIModels.models.values()]}
 

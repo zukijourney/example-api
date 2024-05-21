@@ -1,4 +1,4 @@
-from typing import Optional, Union, Dict
+from typing import Optional, Union
 from ..responses import PrettyJSONResponse
 
 def get_exception_type(etype: Union[Exception, str]) -> str:
@@ -15,7 +15,7 @@ class BaseError(Exception):
         self.code = code
         self.status = status
 
-    def to_dict(self) -> Dict[str, str]:
+    def to_dict(self) -> dict[str, str]:
         return {"error": {"message": self.message, "type": self.type, "param": self.param, "code": self.code}}
 
     def to_response(self) -> PrettyJSONResponse:

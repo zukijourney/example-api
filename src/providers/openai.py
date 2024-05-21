@@ -1,4 +1,5 @@
 import openai
+import traceback
 from typing import Union
 from litestar.response import Stream
 from ..database import KeyManager
@@ -29,6 +30,7 @@ class OpenAI:
             return await streaming_chat_response(response, body) if body.get("stream") \
                 else PrettyJSONResponse(await normal_chat_response(response.choices[0].message.content, body))
         except openai.APIStatusError:
+            traceback.print_exc()
             return InvalidResponseException(
                 message="We were unable to generate a response. Please try again later.",
                 status=500
@@ -42,6 +44,7 @@ class OpenAI:
             response = await client.images.generate(**body)
             return PrettyJSONResponse(response.model_dump(), status_code=200)
         except openai.APIStatusError:
+            traceback.print_exc()
             return InvalidResponseException(
                 message="We were unable to generate a response. Please try again later.",
                 status=500

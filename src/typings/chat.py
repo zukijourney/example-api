@@ -9,7 +9,7 @@ class ChatBody:
     """
 
     model: str
-    messages: list[dict]
+    messages: list[dict[str, Union[str, list]]]
     stream: bool = False
     temperature: Union[float, int] = 1
     top_p: Union[float, int] = 1

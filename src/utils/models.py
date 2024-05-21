@@ -48,7 +48,7 @@ class AIModelMeta(type):
     Metaclass for the AIModel class
     """
 
-    def __init__(cls, name, bases, attrs):
+    def __init__(cls, name, bases, attrs) -> None:
         super().__init__(name, bases, attrs)
         cls.models = {value.id: value for value in attrs.values() if isinstance(value, AIModel)}
 

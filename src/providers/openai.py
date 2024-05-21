@@ -28,7 +28,7 @@ class OpenAI:
             response = await client.chat.completions.create(**body)
             return await streaming_chat_response(response, body) if body.get("stream") \
                 else PrettyJSONResponse(await normal_chat_response(response.choices[0].message.content, body))
-        except Exception:
+        except openai.APIStatusError:
             return InvalidResponseException(
                 message="We were unable to generate a response. Please try again later.",
                 status=500
@@ -37,6 +37,12 @@ class OpenAI:
     @classmethod
     async def image(cls, body: dict) -> PrettyJSONResponse:
         """Performs an image generation request"""
-        client = openai.AsyncOpenAI(api_key=(await cls.get_random_key()))
-        response = await client.images.generate(**body)
-        return PrettyJSONResponse(response.model_dump(), status_code=200)
+        try:
+            client = openai.AsyncOpenAI(api_key=(await cls.get_random_key()))
+            response = await client.images.generate(**body)
+            return PrettyJSONResponse(response.model_dump(), status_code=200)
+        except openai.APIStatusError:
+            return InvalidResponseException(
+                message="We were unable to generate a response. Please try again later.",
+                status=500
+            ).to_response()

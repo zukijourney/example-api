@@ -1,4 +1,4 @@
-import typing
+from typing import Union, get_args, get_origin
 from dataclasses import dataclass
 from collections.abc import Iterable
 
@@ -11,20 +11,24 @@ class ChatBody:
     model: str
     messages: list
     stream: bool = False
-    temperature: float | int = 1
-    top_p: float | int = 1
-    presence_penalty: float | int = 0
-    frequency_penalty: float | int = 0
+    temperature: Union[float, int] = 1
+    top_p: Union[float, int] = 1
+    presence_penalty: Union[float, int] = 0
+    frequency_penalty: Union[float, int] = 0
 
     def validate(self):
         """Validates the body"""
         for field_name, field_type in self.__annotations__.items():
             value = getattr(self, field_name)
-            origin = typing.get_origin(field_type)
-            args = typing.get_args(field_type)
+            origin = get_origin(field_type)
+            args = get_args(field_type)
             
-            if origin and isinstance(value, Iterable):
+            if origin is Union:
+                if not any(isinstance(value, arg) for arg in args):
+                    raise ValueError(f"{field_name} must be one of {args}")
+            elif isinstance(value, Iterable) and origin:
+                print(args)
                 if not all(isinstance(item, args[0]) for item in value):
-                    raise ValueError(f"{field_name} must be of type {field_type}")
+                    raise ValueError(f"All items in {field_name} must be of type {args[0]}")
             elif not isinstance(value, field_type):
                 raise ValueError(f"{field_name} must be of type {field_type}")

@@ -1,5 +1,9 @@
 uvicorn
 litestar
-motor
+pymongo
 openai
 uvicorn
+asgiref
+asyncio-redis-rate-limit
+aioredis
+ujson

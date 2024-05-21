@@ -1,19 +1,20 @@
-import motor.motor_asyncio
+import pymongo
 import ujson
+from asgiref.sync import sync_to_async
 
-with open("values/config.json", "r") as f:
+with open("values/secrets.json", "r") as f:
     config = ujson.load(f)
-
-client = motor.motor_asyncio.AsyncIOMotorClient(config["mongoURI"])
-db = client["db"]["keys"]
 
 class KeyManager:
     """
     Class for retrieving provider keys from the MongoDB database using Motor
     """
 
+    client = pymongo.MongoClient(config["mongoURI"])
+    db = client["db"]["keys"]
+
     @classmethod
     async def get_keys(cls, key_type: str):
         """Returns a list of keys for a given key type"""
-        keys = await db.find_one({"name": key_type})
+        keys = await sync_to_async(cls.db.find_one)({"name": key_type})
         return keys.get("keys") if keys else []

@@ -1,4 +1,4 @@
-import typing
+from typing import get_args, get_origin
 from dataclasses import dataclass
 from collections.abc import Iterable
 
@@ -10,14 +10,15 @@ class AdminBody:
 
     id: int
     action: str
-    status: bool = None
+    status: bool = False
+    property: str = ""
 
     def validate(self):
         """Validates the body"""
         for field_name, field_type in self.__annotations__.items():
             value = getattr(self, field_name)
-            origin = typing.get_origin(field_type)
-            args = typing.get_args(field_type)
+            origin = get_args(field_type)
+            args = get_args(field_type)
             
             if origin and isinstance(value, Iterable):
                 if not all(isinstance(item, args[0]) for item in value):

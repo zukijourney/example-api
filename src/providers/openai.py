@@ -13,7 +13,7 @@ class OpenAI:
     _key_index = 0
 
     @classmethod
-    async def get_random_key(cls):
+    async def get_random_key(cls) -> str:
         """Returns a random OpenAI key from the database using round-robin load balancing"""
         keys = await KeyManager.get_keys("openai")
         chosen_key = keys[cls._key_index]

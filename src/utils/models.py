@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
 from typing import Dict, Any, List, Coroutine, Union
+from litestar.response import Stream
 from ..providers import OpenAI
+from ..responses import PrettyJSONResponse
 
 @dataclass
 class AIModel:
@@ -34,7 +36,7 @@ class AIModel:
         return [model["id"] for model in cls.all_to_json()["data"] if model["type"] == type and model["premium"] == premium]
 
     @classmethod
-    def get_random_provider(cls, model: str) -> Coroutine[Any, Any, Any]:
+    def get_random_provider(cls, model: str) -> Coroutine[Any, Any, Union[PrettyJSONResponse, Stream]]:
         """Returns a provider for the given AI model using round-robin load balancing"""
         ai_model = AIModels.models[model]
         provider = ai_model.providers[ai_model._provider_index]

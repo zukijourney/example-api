@@ -4,6 +4,7 @@ Simple base code for AI reverse proxies.
 ## Dependencies
 - Python 3.8+
 - MongoDB database
+- Redis database (rate limiting)
 - A fucking brain
 
 ## How to Run

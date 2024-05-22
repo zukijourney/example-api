@@ -1,4 +1,4 @@
-from typing import get_args
+from typing import Optional, get_args
 from dataclasses import dataclass
 from collections.abc import Iterable
 
@@ -10,8 +10,8 @@ class AdminBody:
 
     id: int
     action: str
-    status: bool = False
-    property: str = ""
+    status: Optional[bool] = None
+    property: Optional[str] = None
 
     def validate(self) -> None:
         """Validates the body"""

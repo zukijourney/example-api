@@ -1,4 +1,4 @@
-from typing import Union, Literal, Optional, get_args, get_origin, Any, Type
+from typing import Union, Literal, Optional, Any, get_args, get_origin
 from dataclasses import dataclass
 from collections.abc import Iterable
 
@@ -38,11 +38,11 @@ class ChatBody:
                 if not self.__is_instance__(value, field_type):
                     raise ValueError(f"{field_name} must be of type {field_type}")
 
-    def __validate_union__(self, value: Any, args: tuple[Type]) -> bool:
+    def __validate_union__(self, value: Any, args: tuple[type]) -> bool:
         """Helper function to validate Union types"""
         return any(self.__is_instance__(value, arg) for arg in args)
 
-    def __is_instance__(self, value: Any, field_type: Type) -> bool:
+    def __is_instance__(self, value: Any, field_type: type) -> bool:
         """Helper function to check instances, avoiding issues with subscripted generics."""
         origin = get_origin(field_type)
         if origin:

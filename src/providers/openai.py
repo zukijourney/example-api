@@ -1,14 +1,14 @@
 import openai
 import traceback
 from typing import Union
-from litestar.response import Stream
+from litestar.response import Stream, Response
 from ..database import KeyManager
 from ..responses import PrettyJSONResponse, streaming_chat_response, normal_chat_response
 from ..exceptions import InvalidResponseException
 
 class OpenAI:
     """
-    Example OpenAI provider
+    Default OpenAI provider
     """
 
     _key_index = 0
@@ -42,6 +42,67 @@ class OpenAI:
         try:
             client = openai.AsyncOpenAI(api_key=(await cls.get_random_key()))
             response = await client.images.generate(**body)
+            return PrettyJSONResponse(response.model_dump(), status_code=200)
+        except openai.APIStatusError:
+            traceback.print_exc()
+            return InvalidResponseException(
+                message="We were unable to generate a response. Please try again later.",
+                status=500
+            ).to_response()
+        
+    @classmethod
+    async def moderation(cls, body: dict) -> PrettyJSONResponse:
+        """Performs a moderation request"""
+        try:
+            client = openai.AsyncOpenAI(api_key=(await cls.get_random_key()))
+            response = await client.moderations.create(**body)
+            return PrettyJSONResponse(response.model_dump(), status_code=200)
+        except openai.APIStatusError:
+            traceback.print_exc()
+            return InvalidResponseException(
+                message="We were unable to generate a response. Please try again later.",
+                status=500
+            ).to_response()
+        
+    @classmethod
+    async def embedding(cls, body: dict) -> PrettyJSONResponse:
+        """Performs an embedding request"""
+        try:
+            client = openai.AsyncOpenAI(api_key=(await cls.get_random_key()))
+            response = await client.embeddings.create(**body)
+            return PrettyJSONResponse(response.model_dump(), status_code=200)
+        except openai.APIStatusError:
+            traceback.print_exc()
+            return InvalidResponseException(
+                message="We were unable to generate a response. Please try again later.",
+                status=500
+            ).to_response()
+        
+    @classmethod
+    async def tts(cls, body: dict) -> Response:
+        """Performs a TTS request"""
+        try:
+            client = openai.AsyncOpenAI(api_key=(await cls.get_random_key()))
+            response = await client.audio.speech.create(**body)
+            return Response(
+                content=response.content,
+                media_type="audio/mpeg",
+                headers={"Content-Disposition": "attachment;filename=audio.mp3"},
+                status_code=200
+            )
+        except openai.APIStatusError:
+            traceback.print_exc()
+            return InvalidResponseException(
+                message="We were unable to generate a response. Please try again later.",
+                status=500
+            ).to_response()
+        
+    @classmethod
+    async def transcription(cls, body: dict) -> PrettyJSONResponse:
+        """Performs a transcription request"""
+        try:
+            client = openai.AsyncOpenAI(api_key=(await cls.get_random_key()))
+            response = await client.audio.transcriptions.create(**body)
             return PrettyJSONResponse(response.model_dump(), status_code=200)
         except openai.APIStatusError:
             traceback.print_exc()

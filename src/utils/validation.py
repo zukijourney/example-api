@@ -3,12 +3,14 @@ from typing import Optional
 from .errors import InvalidRequestException
 from .models import AIModel
 from ..database import UserManager
-from ..typings import ImageBody, ChatBody, AdminBody
+from ..typings import ImageBody, ChatBody, AdminBody, ModerationBody, EmbeddingBody
 from ..responses import PrettyJSONResponse
 
 endpoint_classes = {
     "/v1/images/generations": ImageBody,
     "/v1/chat/completions": ChatBody,
+    "/v1/moderations": ModerationBody,
+    "/v1/embeddings": EmbeddingBody,
     "/admin": AdminBody
 }
 

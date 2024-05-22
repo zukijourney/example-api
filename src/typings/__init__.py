@@ -1,5 +1,7 @@
-from .admin import AdminBody
-from .chat import ChatBody
-from .image import ImageBody
-
-__all__ = ["AdminBody", "ChatBody", "ImageBody"]
+from .admin import *
+from .chat import *
+from .image import *
+from .moderation import *
+from .embeddings import *
+from .tts import *
+from .transcriptions import *

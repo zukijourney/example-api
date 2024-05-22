@@ -1,12 +1,13 @@
 import time
 import ujson
-from collections.abc import AsyncGenerator
+import traceback
 from litestar.response import Stream
 from openai import AsyncStream
 from openai.types.chat import ChatCompletionChunk
+from collections.abc import AsyncGenerator
 from typing import Union
-from ..exceptions import InvalidResponseException
 from . import PrettyJSONResponse
+from ..exceptions import InvalidResponseException
 from ..utils import gen_system_fingerprint, gen_completion_id
 
 def generate_chunk(chunk: str, model: str) -> dict:
@@ -35,6 +36,7 @@ async def streaming_chat_response(response: Union[AsyncStream[ChatCompletionChun
     try:
         return Stream(generate_response(response, data), media_type="text/event-stream", status_code=200)
     except Exception:
+        traceback.print_exc()
         return InvalidResponseException(
             message="We were unable to generate a response. Please try again later.",
             status=500

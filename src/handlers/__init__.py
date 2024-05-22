@@ -6,6 +6,5 @@ from .models import models
 from .embeddings import embedding
 from .moderation import moderation
 from .tts import tts
-from .transcriptions import transcription
 
-routes = [admin, chat, home, images, models, embedding, moderation, tts, transcription]
+routes = [admin, chat, home, images, models, embedding, moderation, tts]

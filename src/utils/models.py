@@ -69,14 +69,13 @@ class AIModels(metaclass=AIModelMeta):
         ("gpt-4-turbo", "model", 0, "openai", "chat.completions", True, [OpenAI.chat_completion]),
         ("gpt-4o", "model", 0, "openai", "chat.completions", True, [OpenAI.chat_completion]),
         ("dall-e-3", "model", 0, "openai", "images.generations", True, [OpenAI.image]),
-        ("text-moderation-latest", "model", 0, "openai", "moderations", True, [OpenAI.moderation]),
-        ("text-moderation-stable", "model", 0, "openai", "moderations", True, [OpenAI.moderation]),
-        ("text-embedding-ada-002", "model", 0, "openai", "embeddings", True, [OpenAI.embedding]),
-        ("text-embedding-3-small", "model", 0, "openai", "embeddings", True, [OpenAI.embedding]),
+        ("text-moderation-latest", "model", 0, "openai", "moderations", False, [OpenAI.moderation]),
+        ("text-moderation-stable", "model", 0, "openai", "moderations", False, [OpenAI.moderation]),
+        ("text-embedding-ada-002", "model", 0, "openai", "embeddings", False, [OpenAI.embedding]),
+        ("text-embedding-3-small", "model", 0, "openai", "embeddings", False, [OpenAI.embedding]),
         ("text-embedding-3-large", "model", 0, "openai", "embeddings", True, [OpenAI.embedding]),
-        ("tts-1", "model", 0, "openai", "audio.speech", True, [OpenAI.tts]),
-        ("tts-1-hd", "model", 0, "openai", "audio.speech", True, [OpenAI.tts]),
-        ("whisper-1", "model", 0, "openai", "audio.transcriptions", True, [OpenAI.transcription])
+        ("tts-1", "model", 0, "openai", "audio.speech", False, [OpenAI.tts]),
+        ("tts-1-hd", "model", 0, "openai", "audio.speech", True, [OpenAI.tts])
     ]
 
     for model_id, *args in model_data:

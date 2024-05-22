@@ -1,17 +1,18 @@
 from litestar import Request
 from typing import Optional
+from .. import typings
 from .errors import InvalidRequestException
 from .models import AIModel
 from ..database import UserManager
-from ..typings import ImageBody, ChatBody, AdminBody, ModerationBody, EmbeddingBody
 from ..responses import PrettyJSONResponse
 
 endpoint_classes = {
-    "/v1/images/generations": ImageBody,
-    "/v1/chat/completions": ChatBody,
-    "/v1/moderations": ModerationBody,
-    "/v1/embeddings": EmbeddingBody,
-    "/admin": AdminBody
+    "/v1/images/generations": typings.ImageBody,
+    "/v1/chat/completions": typings.ChatBody,
+    "/v1/moderations": typings.ModerationBody,
+    "/v1/embeddings": typings.EmbeddingBody,
+    "/v1/audio/speech": typings.TTSBody,
+    "/admin": typings.AdminBody
 }
 
 async def body_validator(request: Request) -> Optional[PrettyJSONResponse]:
@@ -19,7 +20,7 @@ async def body_validator(request: Request) -> Optional[PrettyJSONResponse]:
 
     body = await request.json()
     key = request.headers.get("Authorization", "").replace("Bearer ", "", 1)
-
+        
     endpoint_classes[request.url.path](**body).validate()
 
     if request.url.path == "/admin":

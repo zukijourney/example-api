@@ -23,6 +23,7 @@ def configure_error_handlers() -> dict[Union[Type, int, Exception], PrettyJSONRe
     
     def value_error_handler(_: Request, exc: Exception) -> PrettyJSONResponse:
         """Validation error handler"""
+        traceback.print_exc()
         return InvalidRequestException(f"Invalid value: {exc}", status=400).to_response()
     
     def http_exception_handler(_: Request, exc: HTTPException) -> PrettyJSONResponse:

@@ -10,7 +10,7 @@ class TTSBody:
 
     model: str
     input: str
-    voice: Literal["alloy", "echo", "fable", "onyx", "nova", "shimmer"] = "alloy"
+    voice: Literal["alloy", "echo", "fable", "onyx", "nova", "shimmer"]
 
     def validate(self) -> None:
         """Validates the body"""

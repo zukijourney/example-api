@@ -96,17 +96,3 @@ class OpenAI:
                 message="We were unable to generate a response. Please try again later.",
                 status=500
             ).to_response()
-        
-    @classmethod
-    async def transcription(cls, body: dict) -> PrettyJSONResponse:
-        """Performs a transcription request"""
-        try:
-            client = openai.AsyncOpenAI(api_key=(await cls.get_random_key()))
-            response = await client.audio.transcriptions.create(**body)
-            return PrettyJSONResponse(response.model_dump(), status_code=200)
-        except openai.APIStatusError:
-            traceback.print_exc()
-            return InvalidResponseException(
-                message="We were unable to generate a response. Please try again later.",
-                status=500
-            ).to_response()

@@ -7,3 +7,4 @@ asgiref
 asyncio-redis-rate-limit
 aioredis
 ujson
+pydantic

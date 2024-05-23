@@ -11,7 +11,6 @@ class AdminBody(BaseModel):
     status: Optional[bool] = None
     property: Optional[str] = None
 
-
     @field_validator("action")
     def validate_action(cls, v: str) -> str:
         if v not in ["create", "get", "update", "delete"]:

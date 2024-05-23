@@ -1,8 +1,8 @@
 # Example API
-Simple base code for AI reverse proxies.
+Simple base code for creating your own AI reverse proxies.
 
 ## Dependencies
-- Python 3.8+
+- Python 3.9+
 - MongoDB database
 - Redis database (rate limiting)
 - A fucking brain

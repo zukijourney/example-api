@@ -3,12 +3,11 @@ from litestar import Request, post
 from ..responses import PrettyJSONResponse
 from ..typings import AdminBody
 from ..database import UserManager
-from ..utils import body_validator
 
 with open("values/secrets.json", "r") as f:
     config = ujson.load(f)
 
-@post("/admin", before_request=body_validator)
+@post("/admin")
 async def admin(request: Request, data: AdminBody) -> PrettyJSONResponse:
     """Admin endpoint request handler"""
 

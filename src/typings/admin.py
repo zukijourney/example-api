@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Any
 from pydantic import BaseModel, field_validator
 
 class AdminBody(BaseModel):
@@ -12,7 +12,7 @@ class AdminBody(BaseModel):
     property: Optional[str] = None
 
     @field_validator("action")
-    def validate_action(cls, v: str) -> str:
+    def validate_action(cls, v: str) -> Any:
         if v not in ["create", "get", "update", "delete"]:
             raise ValueError(f"Invalid action: {v}")
         return v

@@ -18,6 +18,11 @@ async def admin(request: Request, data: AdminBody) -> PrettyJSONResponse:
             content={"error": "Invalid admin key.", "success": False},
             status_code=401
         )
+    elif data.action not in ["create", "get", "update", "delete"]:
+        return PrettyJSONResponse(
+            content={"error": "Invalid action.", "success": False},
+            status_code=400
+        )
 
     if data.action == "create":
         if (await UserManager.get_user_by_id(data.id)):

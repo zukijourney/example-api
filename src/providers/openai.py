@@ -24,6 +24,10 @@ class OpenAI:
     @classmethod
     async def chat_completion(cls, body: dict) -> Union[PrettyJSONResponse, Stream]:
         """Performs a chat completion request"""
+
+        if not body.get("tools"):
+            body.pop("tool_choice", None)
+
         try:
             client = openai.AsyncOpenAI(api_key=(await cls.get_random_key()))
             response = await client.chat.completions.create(**body)

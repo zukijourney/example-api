@@ -31,9 +31,14 @@ class AIModel:
         return {"object": "list", "data": [model.to_json(False) for model in AIModels.models.values()]}
 
     @classmethod
-    def get_all_models(cls, type: str = "chat.completions", premium: bool = False) -> list[str]:
+    def get_all_models(cls, type: str = "chat.completions") -> list[str]:
         """Returns a list of all available AI models IDs"""
-        return [model["id"] for model in cls.all_to_json()["data"] if model["type"] == type and model["premium"] == premium]
+        return [model["id"] for model in cls.all_to_json()["data"] if model["type"] == type]
+    
+    @classmethod
+    def get_premium_models(cls, type: str = "chat.completions") -> list[str]:
+        """Returns a list of all available premium AI models IDs"""
+        return [model["id"] for model in cls.all_to_json()["data"] if model["type"] == type and model["premium"] == True]
 
     @classmethod
     def get_random_provider(cls, model: str) -> Coroutine[Any, Any, Union[PrettyJSONResponse, Stream, Response]]:

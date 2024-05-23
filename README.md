@@ -1,5 +1,5 @@
 # Example API
-Simple base code for creating your own AI reverse proxies.
+Simple base code for creating your own AI reverse proxy.
 
 ## Dependencies
 - Python 3.9+

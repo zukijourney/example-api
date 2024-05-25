@@ -8,7 +8,7 @@ with open("values/secrets.json", "r") as f:
 
 class KeyManager:
     """
-    Class for retrieving provider keys from the MongoDB database using Motor
+    Class for retrieving provider keys from the MongoDB database using PyMongo with Asgiref
     """
 
     client = MongoClient(config["mongoURI"])

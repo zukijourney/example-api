@@ -1,6 +1,7 @@
 import time
 import ujson
 import traceback
+import uuid
 from litestar.response import Stream
 from openai import AsyncStream
 from openai.types.chat import ChatCompletionChunk
@@ -10,7 +11,8 @@ from . import PrettyJSONResponse
 from ..exceptions import InvalidResponseException
 from ..utils import gen_system_fingerprint, gen_completion_id
 
-def generate_chunk(chunk: str, model: str) -> dict:
+def generate_chunk(chunk: str, model: str) -> dict[str, Union[str, list, float]]:
+    """Generates a chunk of a chat response"""
     return {
         "id": f"chatcmpl-{gen_system_fingerprint()}",
         "object": "chat.completion",
@@ -21,6 +23,7 @@ def generate_chunk(chunk: str, model: str) -> dict:
     }
 
 async def generate_response(response: Union[AsyncStream[ChatCompletionChunk], str], data: dict) -> AsyncGenerator[bytes]:
+    """Generates a response and returns a bytes async generator"""
     try:
         if isinstance(response, str):
             for chunk in response:
@@ -34,17 +37,16 @@ async def generate_response(response: Union[AsyncStream[ChatCompletionChunk], st
 async def streaming_chat_response(response: Union[AsyncStream[ChatCompletionChunk], str], data: dict) -> Stream:
     """Streaming response generator"""
     try:
-        return Stream(generate_response(response, data), media_type="text/event-stream", status_code=200)
+        return Stream(generate_response(response, data), status_code=200, headers={"X-Request-ID": str(uuid.uuid4())})
     except Exception:
         traceback.print_exc()
-        return InvalidResponseException(
+        raise InvalidResponseException(
             message="We were unable to generate a response. Please try again later.",
             status=500
-        ).to_response()
+        )
 
 async def normal_chat_response(response: str, data: dict) -> PrettyJSONResponse:
     """Non-streaming response generator"""
-
     return PrettyJSONResponse({
         "id": f"chatcmpl-{gen_completion_id()}",
         "object": "chat.completion",

@@ -9,7 +9,7 @@ with open("values/secrets.json", "r") as f:
 
 class UserManager:
     """
-    Class for handling user-related data in the MongoDB database using Motor
+    Class for handling user-related data in the MongoDB database using PyMongo with Asgiref
     """
 
     client = MongoClient(config["mongoURI"])

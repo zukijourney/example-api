@@ -35,10 +35,10 @@ class OpenAI:
                 else PrettyJSONResponse(await normal_chat_response(response.choices[0].message.content, body))
         except openai.APIStatusError:
             traceback.print_exc()
-            return InvalidResponseException(
+            raise InvalidResponseException(
                 message="We were unable to generate a response. Please try again later.",
                 status=500
-            ).to_response()
+            )
 
     @classmethod
     async def image(cls, body: dict) -> PrettyJSONResponse:
@@ -49,10 +49,10 @@ class OpenAI:
             return PrettyJSONResponse(response.model_dump(), status_code=200)
         except openai.APIStatusError:
             traceback.print_exc()
-            return InvalidResponseException(
+            raise InvalidResponseException(
                 message="We were unable to generate a response. Please try again later.",
                 status=500
-            ).to_response()
+            )
         
     @classmethod
     async def moderation(cls, body: dict) -> PrettyJSONResponse:
@@ -63,10 +63,10 @@ class OpenAI:
             return PrettyJSONResponse(response.model_dump(), status_code=200)
         except openai.APIStatusError:
             traceback.print_exc()
-            return InvalidResponseException(
+            raise InvalidResponseException(
                 message="We were unable to generate a response. Please try again later.",
                 status=500
-            ).to_response()
+            )
         
     @classmethod
     async def embedding(cls, body: dict) -> PrettyJSONResponse:
@@ -77,10 +77,10 @@ class OpenAI:
             return PrettyJSONResponse(response.model_dump(), status_code=200)
         except openai.APIStatusError:
             traceback.print_exc()
-            return InvalidResponseException(
+            raise InvalidResponseException(
                 message="We were unable to generate a response. Please try again later.",
                 status=500
-            ).to_response()
+            )
         
     @classmethod
     async def tts(cls, body: dict) -> Response:
@@ -96,7 +96,7 @@ class OpenAI:
             )
         except openai.APIStatusError:
             traceback.print_exc()
-            return InvalidResponseException(
+            raise InvalidResponseException(
                 message="We were unable to generate a response. Please try again later.",
                 status=500
-            ).to_response()
+            )

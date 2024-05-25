@@ -1,42 +1,50 @@
 import traceback
-from typing import Type, Union
+from typing import Union
 from litestar import Request
-from litestar.exceptions import HTTPException
+from litestar.exceptions import HTTPException, ValidationException
 from ..responses import PrettyJSONResponse
 from ..exceptions import BaseError, InvalidRequestException, InvalidResponseException
 
-def configure_error_handlers() -> dict[Union[Type, int, Exception], PrettyJSONResponse]:
+def configure_error_handlers() -> dict[Union[type, int, Exception], PrettyJSONResponse]:
     """Sets up all error handlers"""
+
+    def make_response(message: str, error_type: str, status_code: int) -> PrettyJSONResponse:
+        """Sets up the response for an error"""
+        return PrettyJSONResponse(
+            {"error": {"message": message, "type": error_type, "param": None, "code": None}},
+            status_code=status_code
+        )
 
     def status_404_handler(request: Request, _: Exception) -> PrettyJSONResponse:
         """Not found page error handler"""
-        return InvalidRequestException(f"Invalid URL ({request.method} {request.url.path})", status=404).to_response()
+        return make_response(f"Invalid URL ({request.method} {request.url.path})", "invalid_request_error", 404)
 
     def status_405_handler(request: Request, _: Exception) -> PrettyJSONResponse:
         """Method not allowed error handler"""
-        return InvalidRequestException(f"Invalid Method ({request.method} {request.url.path})", status=405).to_response()
+        return make_response(f"Invalid Method ({request.method} {request.url.path})", "invalid_request_error", 405)
 
     def exception_handler(_: Request, exc: Exception) -> PrettyJSONResponse:
         """Generic error handler"""
         traceback.print_exc()
-        return BaseError(f"An unexpected error has occurred: {exc}", status=500).to_response()
+        return make_response(f"An unexpected error has occurred: {exc}", "base_error", 500)
     
-    def value_error_handler(_: Request, exc: Exception) -> PrettyJSONResponse:
+    def validation_error_handler(_: Request, exc: ValidationException) -> PrettyJSONResponse:
         """Validation error handler"""
-        traceback.print_exc()
-        return InvalidRequestException(f"Invalid value: {exc}", status=400).to_response()
+        message = exc.extra[0]["message"].replace("Value error, ", "")
+        return make_response(message, "invalid_request_error", 400 if "Invalid model" not in message else 404)
     
-    def http_exception_handler(_: Request, exc: HTTPException) -> PrettyJSONResponse:
+    def http_exception_handler(_: Request, exc: Union[InvalidRequestException, InvalidResponseException]) -> PrettyJSONResponse:
         """HTTP exception handler"""
-        return InvalidRequestException(exc.detail, status=exc.status_code).to_response()
+        return make_response(exc.message, exc.type, exc.status)
 
     return {
         404: status_404_handler,
         405: status_405_handler,
         Exception: exception_handler,
-        BaseError: BaseError.to_response,
-        InvalidRequestException: InvalidRequestException.to_response,
-        InvalidResponseException: InvalidResponseException.to_response,
+        BaseError: exception_handler,
+        InvalidRequestException: http_exception_handler,
+        InvalidResponseException: http_exception_handler,
         HTTPException: http_exception_handler,
-        ValueError: value_error_handler
+        ValueError: validation_error_handler,
+        ValidationException: validation_error_handler
     }

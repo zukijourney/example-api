@@ -14,6 +14,6 @@ async def chat(request: Request, data: ChatBody) -> Union[Stream, PrettyJSONResp
     key = request.headers.get("Authorization").replace("Bearer ", "", 1)
 
     if not (await UserManager.get_property(key, "premium")) and data.model in AIModel.get_premium_models():
-        return InvalidRequestException("This model is not available in the free tier.", status_code=402).to_response()
+        raise InvalidRequestException("This model is not available in the free tier.", status_code=402)
 
     return await (AIModel.get_random_provider(data.model))(data.model_dump())

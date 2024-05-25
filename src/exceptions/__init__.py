@@ -1,26 +1,24 @@
-from typing import Optional, Union
-from ..responses import PrettyJSONResponse
+from typing import Union
 
 def get_exception_type(etype: Union[Exception, str]) -> str:
+    """Returns a string representation of the exception class name"""
     class_name = etype.__class__.__name__.replace("Exception", "Error")
     return "".join(["_" + i.lower() if i.isupper() else i for i in class_name]).lstrip("_")
 
 class BaseError(Exception):
-    def __init__(self, message: str, type: Optional[str] = None, param: Optional[str] = None, code: Optional[Union[int, str]] = None, status: int = None) -> None:
+    """
+    Base class for all response exceptions in this project
+    """
+
+    def __init__(self, message: str, status: int = None) -> None:
         self.message = message
-        self.type = get_exception_type(self) if isinstance(self, Exception) else type
-        self.param = param
-        self.code = code
+        self.type = get_exception_type(self)
         self.status = status
 
-    def to_dict(self) -> dict[str, str]:
-        return {"error": {"message": self.message, "type": self.type, "param": self.param, "code": self.code}}
-
-    def to_response(self) -> PrettyJSONResponse:
-        return PrettyJSONResponse(content=self.to_dict(), status_code=self.status)
-
 class InvalidRequestException(BaseError):
+    """Exception for invalid requests"""
     pass
 
 class InvalidResponseException(BaseError):
+    """Exception for invalid responses"""
     pass

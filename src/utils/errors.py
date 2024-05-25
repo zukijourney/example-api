@@ -4,16 +4,10 @@ from litestar import Request
 from litestar.exceptions import HTTPException, ValidationException
 from ..responses import PrettyJSONResponse
 from ..exceptions import BaseError, InvalidRequestException, InvalidResponseException
+from ..utils import make_response
 
 def configure_error_handlers() -> dict[Union[type, int, Exception], PrettyJSONResponse]:
     """Sets up all error handlers"""
-
-    def make_response(message: str, error_type: str, status_code: int) -> PrettyJSONResponse:
-        """Sets up the response for an error"""
-        return PrettyJSONResponse(
-            {"error": {"message": message, "type": error_type, "param": None, "code": None}},
-            status_code=status_code
-        )
 
     def status_404_handler(request: Request, _: Exception) -> PrettyJSONResponse:
         """Not found page error handler"""

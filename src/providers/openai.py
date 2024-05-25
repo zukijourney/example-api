@@ -4,7 +4,7 @@ from typing import Union
 from litestar.response import Stream, Response
 from ..database import KeyManager
 from ..responses import PrettyJSONResponse, streaming_chat_response, normal_chat_response
-from ..exceptions import InvalidResponseException
+from ..utils import make_response
 
 class OpenAI:
     """
@@ -35,9 +35,10 @@ class OpenAI:
                 else PrettyJSONResponse(await normal_chat_response(response.choices[0].message.content, body))
         except openai.APIStatusError:
             traceback.print_exc()
-            raise InvalidResponseException(
+            return make_response(
                 message="We were unable to generate a response. Please try again later.",
-                status=500
+                error_type="invalid_response_error",
+                status_code=500
             )
 
     @classmethod
@@ -49,9 +50,10 @@ class OpenAI:
             return PrettyJSONResponse(response.model_dump(), status_code=200)
         except openai.APIStatusError:
             traceback.print_exc()
-            raise InvalidResponseException(
+            return make_response(
                 message="We were unable to generate a response. Please try again later.",
-                status=500
+                error_type="invalid_response_error",
+                status_code=500
             )
         
     @classmethod
@@ -63,9 +65,10 @@ class OpenAI:
             return PrettyJSONResponse(response.model_dump(), status_code=200)
         except openai.APIStatusError:
             traceback.print_exc()
-            raise InvalidResponseException(
+            return make_response(
                 message="We were unable to generate a response. Please try again later.",
-                status=500
+                error_type="invalid_response_error",
+                status_code=500
             )
         
     @classmethod
@@ -77,9 +80,10 @@ class OpenAI:
             return PrettyJSONResponse(response.model_dump(), status_code=200)
         except openai.APIStatusError:
             traceback.print_exc()
-            raise InvalidResponseException(
+            return make_response(
                 message="We were unable to generate a response. Please try again later.",
-                status=500
+                error_type="invalid_response_error",
+                status_code=500
             )
         
     @classmethod
@@ -96,7 +100,8 @@ class OpenAI:
             )
         except openai.APIStatusError:
             traceback.print_exc()
-            raise InvalidResponseException(
+            return make_response(
                 message="We were unable to generate a response. Please try again later.",
-                status=500
+                error_type="invalid_response_error",
+                status_code=500
             )

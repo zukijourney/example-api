@@ -7,7 +7,7 @@ from ..guards import auth_guard, ratelimit_guard
 from ..responses import PrettyJSONResponse
 from ..database import UserManager
 
-@post("/v1/chat/completions", guards=[auth_guard, ratelimit_guard])
+@post("/v1/chat/completions", guards=[auth_guard])
 async def chat(request: Request, data: ChatBody) -> Union[Stream, PrettyJSONResponse]:
     """Chat endpoint request handler"""
 

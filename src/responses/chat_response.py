@@ -7,9 +7,9 @@ from openai import AsyncStream
 from openai.types.chat import ChatCompletionChunk
 from collections.abc import AsyncGenerator
 from typing import Union
+from ..utils import gen_system_fingerprint, gen_completion_id
 from . import PrettyJSONResponse
 from ..exceptions import InvalidResponseException
-from ..utils import gen_system_fingerprint, gen_completion_id
 
 def generate_chunk(chunk: str, model: str) -> dict[str, Union[str, list, float]]:
     """Generates a chunk of a chat response"""

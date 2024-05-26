@@ -6,5 +6,5 @@ from .handlers import routes
 app = Litestar(
     route_handlers=routes,
     exception_handlers=configure_error_handlers(),
-    cors_config=CORSConfig(max_age=3600),
+    cors_config=CORSConfig(max_age=3600)
 )

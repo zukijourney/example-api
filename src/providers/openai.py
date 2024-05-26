@@ -1,6 +1,6 @@
 import openai
 import traceback
-from typing import Union
+from typing import Union, Optional
 from litestar.response import Stream, Response
 from ..database import KeyManager
 from ..responses import PrettyJSONResponse, streaming_chat_response, normal_chat_response
@@ -17,7 +17,7 @@ class OpenAI:
     async def get_random_key(cls) -> str:
         """Returns a random OpenAI key from the database using round-robin load balancing"""
         keys = await KeyManager.get_keys("openai")
-        chosen_key = keys[cls._key_index]
+        chosen_key = str(keys[cls._key_index] or "a") if keys is not None else "a"
         cls._key_index = (cls._key_index + 1) % len(keys)
         return chosen_key
 
@@ -55,7 +55,7 @@ class OpenAI:
                 error_type="invalid_response_error",
                 status_code=500
             )
-        
+
     @classmethod
     async def moderation(cls, body: dict) -> PrettyJSONResponse:
         """Performs a moderation request"""
@@ -70,7 +70,7 @@ class OpenAI:
                 error_type="invalid_response_error",
                 status_code=500
             )
-        
+
     @classmethod
     async def embedding(cls, body: dict) -> PrettyJSONResponse:
         """Performs an embedding request"""
@@ -85,7 +85,7 @@ class OpenAI:
                 error_type="invalid_response_error",
                 status_code=500
             )
-        
+
     @classmethod
     async def tts(cls, body: dict) -> Response:
         """Performs a TTS request"""

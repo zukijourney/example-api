@@ -16,7 +16,7 @@ class OpenAI:
     async def get_valid_key(cls) -> str:
         """Returns a random OpenAI key from the database using round-robin load balancing"""
         keys = await KeyManager.get_keys("openai")
-        chosen_key = str(keys[cls._key_index] or "a") if keys is not None else "a"
+        chosen_key = keys[cls._key_index]
         cls._key_index = (cls._key_index + 1) % len(keys)
         return chosen_key
 
@@ -30,6 +30,7 @@ class OpenAI:
 
         client = openai.AsyncOpenAI(api_key=(await cls.get_valid_key()))
         response = await client.chat.completions.create(**body)
+
         return await streaming_chat_response(response, body) if body.get("stream") \
             else PrettyJSONResponse(await normal_chat_response(response.choices[0].message.content, body))
 

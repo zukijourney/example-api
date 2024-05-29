@@ -2,7 +2,7 @@ import ujson
 from litestar.connection import ASGIConnection
 from litestar.handlers.base import BaseRouteHandler
 from asyncio_redis_rate_limit import RateLimiter, RateSpec, RateLimitError
-from aioredis import Redis
+from redis.asyncio import Redis
 from ..database import UserManager
 from ..exceptions import InvalidRequestException
 

@@ -7,9 +7,8 @@ from openai import AsyncStream
 from openai.types.chat import ChatCompletionChunk
 from collections.abc import AsyncGenerator
 from typing import Union
-from ..utils import gen_system_fingerprint, gen_completion_id
+from ..utils import gen_system_fingerprint, gen_completion_id, make_response
 from . import PrettyJSONResponse
-from ..exceptions import InvalidResponseException
 
 def generate_chunk(chunk: str, model: str) -> dict[str, Union[str, list, float]]:
     """Generates a chunk of a chat response"""
@@ -40,8 +39,9 @@ async def streaming_chat_response(response: Union[AsyncStream[ChatCompletionChun
         return Stream(generate_response(response, data), status_code=200, headers={"X-Request-ID": str(uuid.uuid4())})
     except Exception:
         traceback.print_exc()
-        raise InvalidResponseException(
+        return make_response(
             message="We were unable to generate a response. Please try again later.",
+            type="invalid_response_error",
             status=500
         )
 

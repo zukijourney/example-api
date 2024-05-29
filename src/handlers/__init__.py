@@ -7,4 +7,13 @@ from .embeddings import embedding
 from .moderation import moderation
 from .tts import tts
 
-routes = [admin, chat, home, images, models, embedding, moderation, tts]
+routes = [
+    admin,
+    chat,
+    home,
+    images,
+    models,
+    embedding,
+    moderation,
+    tts
+]

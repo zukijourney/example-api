@@ -63,7 +63,7 @@ class AIModels(metaclass=AIModelMeta):
     """
 
     model_data = [
-        ("gpt-3.5-turbo-0613", "model", 0, "openai", "chat.completions", True, [OpenAI.chat_completion]),
+        ("gpt-3.5-turbo-0613", "model", 0, "openai", "chat.completions", False, [OpenAI.chat_completion]),
         ("gpt-3.5-turbo-16k", "model", 0, "openai", "chat.completions", False, [OpenAI.chat_completion]),
         ("gpt-3.5-turbo", "model", 0, "openai", "chat.completions", False, [OpenAI.chat_completion]),
         ("gpt-3.5-turbo-1106", "model", 0, "openai", "chat.completions", False, [OpenAI.chat_completion]),
@@ -84,4 +84,4 @@ class AIModels(metaclass=AIModelMeta):
     ]
 
     for model_id, *args in model_data:
-        locals()[model_id.replace("-", "_")] = AIModel(model_id, *args)
+        locals()[model_id] = AIModel(model_id, *args)

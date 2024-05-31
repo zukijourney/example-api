@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional, Literal
 from pydantic import BaseModel, field_validator
 from ..utils import AIModel
 
@@ -9,7 +9,7 @@ class ImageBody(BaseModel):
 
     model: str
     prompt: str
-    size: str = "1024x1024"
+    size: Optional[Literal["256x256", "512x512", "1024x1024", "1792x1024", "1024x1792"]] = "1024x1024"
 
     @field_validator("model")
     def validate_model(cls, v: str) -> Any:

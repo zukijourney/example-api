@@ -1,5 +1,6 @@
-from typing import Union, Literal, Optional, Any
+from typing import Union, Optional, Any, Iterable
 from pydantic import BaseModel, field_validator
+from openai.types import chat
 from ..utils import AIModel
 
 class ChatBody(BaseModel):
@@ -8,14 +9,14 @@ class ChatBody(BaseModel):
     """
 
     model: str
-    messages: list[dict[str, Union[str, list]]]
+    messages: Iterable[chat.ChatCompletionMessageParam]
     stream: bool = False
     temperature: Union[float, int] = 1
     top_p: Union[float, int] = 1
     presence_penalty: Union[float, int] = 0
     frequency_penalty: Union[float, int] = 0
-    tools: Optional[list] = None
-    tool_choice: Optional[Union[Literal["auto", "required", "none"], dict]] = None
+    tools: Optional[Iterable[chat.ChatCompletionToolParam]] = None
+    tool_choice: Optional[chat.ChatCompletionToolChoiceOptionParam] = None
 
     @field_validator("model")
     def validate_model(cls, v: str) -> Any:

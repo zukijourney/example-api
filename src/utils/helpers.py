@@ -3,7 +3,7 @@ import string
 import openai
 import traceback
 from fastapi.responses import ORJSONResponse, StreamingResponse
-from typing import Union
+from typing import Union, Callable, Awaitable, Any
 
 def gen_random_string(prefix: str, length: int = 29, charset: str = string.ascii_letters + string.digits) -> str:
     """Generates a random string with a given prefix and length"""
@@ -24,7 +24,7 @@ def make_response(message: str, type: str, status: int) -> ORJSONResponse:
         status_code=status
     )
 
-def handle_errors(func):
+def handle_errors(func: Callable[[Any, Any], Awaitable[Any]]) -> Callable[[Any, Any], Awaitable[Any]]:
     async def wrapper(*args, **kwargs) -> Union[ORJSONResponse, StreamingResponse]:
         try:
             return await func(*args, **kwargs)

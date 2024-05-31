@@ -1,4 +1,4 @@
-from typing import Union, Iterable, Any
+from typing import Union, Iterable, Any, Literal, Optional
 from pydantic import BaseModel, field_validator
 from ..utils import AIModel
 
@@ -9,6 +9,8 @@ class EmbeddingBody(BaseModel):
 
     model: str
     input: Union[str, list[str], Iterable[int], Iterable[Iterable[int]]]
+    dimensions: int
+    encoding_format: Optional[Literal["float", "base64"]] = None
 
     @field_validator("model")
     def validate_model(cls, v: str) -> Any:

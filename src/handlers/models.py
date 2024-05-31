@@ -1,8 +1,10 @@
-from litestar import get
-from ..responses import PrettyJSONResponse
+from fastapi import APIRouter
+from fastapi.responses import ORJSONResponse
 from ..utils.models import AIModel
 
-@get("/v1/models")
-async def models() -> PrettyJSONResponse:
+router = APIRouter()
+
+@router.get("/v1/models", response_model=None)
+async def models() -> ORJSONResponse:
     """Models endpoint request handler"""
-    return PrettyJSONResponse(AIModel.all_to_json())
+    return ORJSONResponse(AIModel.all_to_json())

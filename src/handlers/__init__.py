@@ -1,11 +1,11 @@
-from .admin import admin
-from .chat import chat
-from .home import home
-from .images import images
-from .models import models
-from .embeddings import embedding
-from .moderation import moderation
-from .tts import tts
+from .admin import router as admin
+from .chat import router as chat
+from .home import router as home
+from .images import router as images
+from .models import router as models
+from .embeddings import router as embedding
+from .moderation import router as moderation
+from .tts import router as tts
 
 routes = [
     admin,

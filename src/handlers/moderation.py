@@ -1,12 +1,14 @@
-from litestar import post, Request
-from ..guards import auth_guard, ratelimit_guard
+from fastapi import APIRouter, Request, Depends
+from fastapi.responses import ORJSONResponse
+from ..dependencies import auth, rate_limit
 from ..typings import ModerationBody
 from ..utils import AIModel, InvalidRequestException
-from ..responses import PrettyJSONResponse
 from ..database import UserManager
 
-@post("/v1/moderations", guards=[auth_guard, ratelimit_guard])
-async def moderation(request: Request, data: ModerationBody) -> PrettyJSONResponse:
+router = APIRouter()
+
+@router.post("/v1/moderations", dependencies=[Depends(auth), Depends(rate_limit)], response_model=None)
+async def moderation(request: Request, data: ModerationBody) -> ORJSONResponse:
     """Moderation endpoint request handler"""
 
     key = request.headers.get("Authorization").replace("Bearer ", "", 1)
@@ -16,4 +18,4 @@ async def moderation(request: Request, data: ModerationBody) -> PrettyJSONRespon
     if not premium_check and is_premium_model:
         raise InvalidRequestException("This model is not available in the free tier.", status_code=402)
 
-    return await (AIModel.get_random_provider(data.model))(data.model_dump())
+    return await (AIModel.get_provider(data.model))(data.model_dump())

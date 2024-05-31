@@ -1,20 +1,19 @@
 import ujson
-from litestar.connection import ASGIConnection
-from litestar.handlers.base import BaseRouteHandler
-from asyncio_redis_rate_limit import RateLimiter, RateSpec, RateLimitError
+from fastapi import Request
 from redis.asyncio import Redis
+from asyncio_redis_rate_limit import RateLimiter, RateSpec, RateLimitError
 from ..database import UserManager
 from ..exceptions import InvalidRequestException
 
-with open("values/secrets.json", "r") as f:
+with open("values/secrets.json") as f:
     config = ujson.load(f)
 
 redis = Redis.from_url(config["redisURI"])
 
-async def ratelimit_guard(connection: ASGIConnection, _: BaseRouteHandler) -> None:
-    """Rate limiting guard (executes before the route handler)"""
+async def rate_limit(request: Request) -> None:
+    """Rate limiting dependency (executes before the route handler)"""
 
-    key = connection.headers.get("Authorization", "").replace("Bearer ", "", 1)
+    key = request.headers.get("Authorization", "").replace("Bearer ", "", 1)
     premium = await UserManager.get_property(key, "premium")
 
     try:

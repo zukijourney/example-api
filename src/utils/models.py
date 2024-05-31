@@ -1,8 +1,7 @@
 from dataclasses import dataclass, field
-from typing import Any, Coroutine, Union
-from litestar.response import Stream, Response
+from typing import Union
+from collections.abc import Callable
 from ..providers import OpenAI
-from ..responses import PrettyJSONResponse
 
 @dataclass
 class AIModel:
@@ -16,6 +15,7 @@ class AIModel:
     owned_by: str = "openai"
     type: str = "chat.completions"
     premium: bool = False
+    endpoint: str = "/v1/chat/completions"
     providers: list = field(default_factory=list)
     _provider_index: int = field(default=0, init=False, repr=False)
 
@@ -41,7 +41,7 @@ class AIModel:
         return [model["id"] for model in cls.all_to_json()["data"] if model["type"] == type and model["premium"] == True]
 
     @classmethod
-    def get_random_provider(cls, model: str) -> Coroutine[Any, Any, Union[PrettyJSONResponse, Stream, Response]]:
+    def get_provider(cls, model: str) -> Callable:
         """Returns a provider for the given AI model using round-robin load balancing"""
         ai_model = AIModels.models[model]
         provider = ai_model.providers[ai_model._provider_index]
@@ -50,7 +50,7 @@ class AIModel:
 
 class AIModelMeta(type):
     """
-    Metaclass for the AIModel class
+    Metaclass for the AIModel class that initializes and registers AI models
     """
 
     def __init__(cls, name, bases, attrs) -> None:
@@ -59,29 +59,87 @@ class AIModelMeta(type):
 
 class AIModels(metaclass=AIModelMeta):
     """
-    Class for registering AI models
+    Class for registering and managing AI models.
     """
 
-    model_data = [
-        ("gpt-3.5-turbo-0613", "model", 0, "openai", "chat.completions", False, [OpenAI.chat_completion]),
-        ("gpt-3.5-turbo-16k", "model", 0, "openai", "chat.completions", False, [OpenAI.chat_completion]),
-        ("gpt-3.5-turbo", "model", 0, "openai", "chat.completions", False, [OpenAI.chat_completion]),
-        ("gpt-3.5-turbo-1106", "model", 0, "openai", "chat.completions", False, [OpenAI.chat_completion]),
-        ("gpt-3.5-turbo-0125", "model", 0, "openai", "chat.completions", False, [OpenAI.chat_completion]),
-        ("gpt-4", "model", 0, "openai", "chat.completions", False, [OpenAI.chat_completion]),
-        ("gpt-4-1106-preview", "model", 0, "openai", "chat.completions", True, [OpenAI.chat_completion]),
-        ("gpt-4-turbo-preview", "model", 0, "openai", "chat.completions", True, [OpenAI.chat_completion]),
-        ("gpt-4-turbo", "model", 0, "openai", "chat.completions", True, [OpenAI.chat_completion]),
-        ("gpt-4o", "model", 0, "openai", "chat.completions", True, [OpenAI.chat_completion]),
-        ("dall-e-3", "model", 0, "openai", "images.generations", True, [OpenAI.image]),
-        ("text-moderation-latest", "model", 0, "openai", "moderations", False, [OpenAI.moderation]),
-        ("text-moderation-stable", "model", 0, "openai", "moderations", False, [OpenAI.moderation]),
-        ("text-embedding-ada-002", "model", 0, "openai", "embeddings", False, [OpenAI.embedding]),
-        ("text-embedding-3-small", "model", 0, "openai", "embeddings", False, [OpenAI.embedding]),
-        ("text-embedding-3-large", "model", 0, "openai", "embeddings", True, [OpenAI.embedding]),
-        ("tts-1", "model", 0, "openai", "audio.speech", False, [OpenAI.tts]),
-        ("tts-1-hd", "model", 0, "openai", "audio.speech", True, [OpenAI.tts])
-    ]
-
-    for model_id, *args in model_data:
-        locals()[model_id] = AIModel(model_id, *args)
+    gpt_3_5_turbo = AIModel(
+        id="gpt-3.5-turbo",
+        providers=[OpenAI.chat_completion]
+    )
+    gpt_3_5_turbo_1106 = AIModel(
+        id="gpt-3.5-turbo-1106",
+        providers=[OpenAI.chat_completion]
+    )
+    gpt_3_5_turbo_0125 = AIModel(
+        id="gpt-3.5-turbo-0125",
+        providers=[OpenAI.chat_completion]
+    )
+    gpt_4 = AIModel(
+        id="gpt-4",
+        providers=[OpenAI.chat_completion]
+    )
+    gpt_4_1106_preview = AIModel(
+        id="gpt-4-1106-preview",
+        premium=True,
+        providers=[OpenAI.chat_completion]
+    )
+    gpt_4_turbo_preview = AIModel(
+        id="gpt-4-turbo-preview",
+        premium=True,
+        providers=[OpenAI.chat_completion]
+    )
+    gpt_4_turbo = AIModel(
+        id="gpt-4-turbo",
+        premium=True,
+        providers=[OpenAI.chat_completion]
+    )
+    gpt_4o = AIModel(
+        id="gpt-4o",
+        premium=True,
+        providers=[OpenAI.chat_completion]
+    )
+    dall_e_3 = AIModel(
+        id="dall-e-3",
+        type="images.generations",
+        premium=True,
+        providers=[OpenAI.image],
+        endpoint="/v1/images/generations"
+    )
+    text_moderation_latest = AIModel(
+        id="text-moderation-latest",
+        type="moderations",
+        providers=[OpenAI.moderation],
+        endpoint="/v1/moderations"
+    )
+    text_moderation_stable = AIModel(
+        id="text-moderation-stable",
+        type="moderations",
+        providers=[OpenAI.moderation],
+        endpoint="/v1/moderations"
+    )
+    text_embedding_3_small = AIModel(
+        id="text-embedding-3-small",
+        type="embeddings",
+        providers=[OpenAI.embedding],
+        endpoint="/v1/embeddings"
+    )
+    text_embedding_3_large = AIModel(
+        id="text-embedding-3-large",
+        type="embeddings",
+        premium=True,
+        providers=[OpenAI.embedding],
+        endpoint="/v1/embeddings"
+    )
+    tts_1 = AIModel(
+        id="tts-1",
+        type="audio.speech",
+        providers=[OpenAI.tts],
+        endpoint="/v1/audio/speech"
+    )
+    tts_1_hd = AIModel(
+        id="tts-1-hd",
+        type="audio.speech",
+        premium=True,
+        providers=[OpenAI.tts],
+        endpoint="/v1/audio/speech"
+    )

@@ -1,9 +1,8 @@
 import random
 import string
-import ujson
 import openai
 import traceback
-from litestar.response import Response, Stream
+from fastapi.responses import ORJSONResponse, StreamingResponse
 from typing import Union
 
 def gen_random_string(prefix: str, length: int = 29, charset: str = string.ascii_letters + string.digits) -> str:
@@ -18,24 +17,22 @@ def gen_system_fingerprint() -> str:
     """Generates a system fingerprint"""
     return gen_random_string("fp_", length=10, charset=string.ascii_lowercase + string.digits)
 
-def make_response(message: str, type: str, status: int) -> Response:
+def make_response(message: str, type: str, status: int) -> ORJSONResponse:
     """Sets up the response for an error"""
-    return Response(
-        ujson.dumps(
-            obj={"error": {"message": message, "type": type, "param": None, "code": None}},
-            indent=4,
-            escape_forward_slashes=False
-        ),
+    return ORJSONResponse(
+        {"error": {"message": message, "type": type, "param": None, "code": None}},
         status_code=status
     )
 
-async def handle_errors(func, *args, **kwargs) -> Union[Response, Stream]:
-    try:
-        return await func(*args, **kwargs)
-    except openai.APIStatusError:
-        traceback.print_exc()
-        return make_response(
-            message="We were unable to generate a response. Please try again later.",
-            type="invalid_response_error",
-            status_code=500
-        )
+def handle_errors(func):
+    async def wrapper(*args, **kwargs) -> Union[ORJSONResponse, StreamingResponse]:
+        try:
+            return await func(*args, **kwargs)
+        except openai.APIStatusError:
+            traceback.print_exc()
+            return make_response(
+                message="We were unable to generate a response. Please try again later.",
+                type="invalid_response_error",
+                status_code=500
+            )
+    return wrapper

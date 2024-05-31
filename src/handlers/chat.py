@@ -1,14 +1,15 @@
-from litestar import post, Request
-from litestar.response import Stream
+from fastapi import APIRouter, Request, Depends
+from fastapi.responses import StreamingResponse, ORJSONResponse
 from typing import Union
 from ..utils import AIModel, InvalidRequestException
 from ..typings import ChatBody
-from ..guards import auth_guard, ratelimit_guard
-from ..responses import PrettyJSONResponse
+from ..dependencies import auth, rate_limit
 from ..database import UserManager
 
-@post("/v1/chat/completions", guards=[auth_guard, ratelimit_guard], status_code=200)
-async def chat(request: Request, data: ChatBody) -> Union[Stream, PrettyJSONResponse]:
+router = APIRouter()
+
+@router.post("/v1/chat/completions", dependencies=[Depends(auth), Depends(rate_limit)], response_model=None)
+async def chat(request: Request, data: ChatBody) -> Union[StreamingResponse, ORJSONResponse]:
     """Chat endpoint request handler"""
 
     key = request.headers.get("Authorization").replace("Bearer ", "", 1)
@@ -18,4 +19,4 @@ async def chat(request: Request, data: ChatBody) -> Union[Stream, PrettyJSONResp
     if not premium_check and is_premium_model:
         raise InvalidRequestException("This model is not available in the free tier.", status_code=402)
 
-    return await (AIModel.get_random_provider(data.model))(data.model_dump())
+    return await (AIModel.get_provider(data.model))(data.model_dump())

@@ -1,8 +1,8 @@
 import openai
 from typing import Union
-from litestar.response import Stream, Response
+from fastapi.responses import StreamingResponse, Response, ORJSONResponse
 from ..database import KeyManager
-from ..responses import PrettyJSONResponse, streaming_chat_response, normal_chat_response
+from ..responses import streaming_chat_response, normal_chat_response
 from ..utils import handle_errors
 
 class OpenAI:
@@ -22,41 +22,36 @@ class OpenAI:
 
     @classmethod
     @handle_errors
-    async def chat_completion(cls, body: dict) -> Union[PrettyJSONResponse, Stream]:
+    async def chat_completion(cls, body: dict) -> Union[ORJSONResponse, StreamingResponse]:
         """Performs a chat completion request"""
-
-        if not body.get("tools"):
-            body.pop("tool_choice", None)
-
         client = openai.AsyncOpenAI(api_key=(await cls.get_valid_key()))
         response = await client.chat.completions.create(**body)
-
         return await streaming_chat_response(response, body) if body.get("stream") \
-            else PrettyJSONResponse(await normal_chat_response(response.choices[0].message.content, body))
+            else ORJSONResponse(await normal_chat_response(response.choices[0].message.content, body))
 
     @classmethod
     @handle_errors
-    async def image(cls, body: dict) -> PrettyJSONResponse:
+    async def image(cls, body: dict) -> ORJSONResponse:
         """Performs an image generation request"""
         client = openai.AsyncOpenAI(api_key=(await cls.get_valid_key()))
         response = await client.images.generate(**body)
-        return PrettyJSONResponse(response.model_dump())
+        return ORJSONResponse(response.model_dump())
 
     @classmethod
     @handle_errors
-    async def moderation(cls, body: dict) -> PrettyJSONResponse:
+    async def moderation(cls, body: dict) -> ORJSONResponse:
         """Performs a moderation request"""
         client = openai.AsyncOpenAI(api_key=(await cls.get_valid_key()))
         response = await client.moderations.create(**body)
-        return PrettyJSONResponse(response.model_dump())
+        return ORJSONResponse(response.model_dump())
 
     @classmethod
     @handle_errors
-    async def embedding(cls, body: dict) -> PrettyJSONResponse:
+    async def embedding(cls, body: dict) -> ORJSONResponse:
         """Performs an embedding request"""
         client = openai.AsyncOpenAI(api_key=(await cls.get_valid_key()))
         response = await client.embeddings.create(**body)
-        return PrettyJSONResponse(response.model_dump())
+        return ORJSONResponse(response.model_dump())
 
     @classmethod
     @handle_errors

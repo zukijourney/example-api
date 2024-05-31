@@ -15,7 +15,7 @@ class ChatBody(BaseModel):
     presence_penalty: Union[float, int] = 0
     frequency_penalty: Union[float, int] = 0
     tools: Optional[list] = None
-    tool_choice: Union[Literal["auto", "required", "none"], dict] = "none"
+    tool_choice: Optional[Union[Literal["auto", "required", "none"], dict]] = None
 
     @field_validator("model")
     def validate_model(cls, v: str) -> Any:

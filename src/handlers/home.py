@@ -1,7 +1,12 @@
-from litestar import get
-from ..responses import PrettyJSONResponse
+from fastapi import APIRouter
+from fastapi.responses import ORJSONResponse
 
-@get("/")
-async def home() -> PrettyJSONResponse:
+router = APIRouter()
+
+@router.get("/", response_model=None)
+async def home() -> ORJSONResponse:
     """Home endpoint request handler"""
-    return PrettyJSONResponse({"message": "Welcome to my very own self-hosted AI reverse proxy!"})
+    return ORJSONResponse({
+        "message": "Welcome to my very own self-hosted AI reverse proxy!",
+        "github": "https://github.com/zukijourney/example-api",
+    })

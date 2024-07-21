@@ -1,0 +1,29 @@
+
+generator client {
+  provider             = "prisma-client-py"
+  interface            = "asyncio"
+  recursive_type_depth = -1
+}
+
+datasource db {
+  provider = "cockroachdb"
+  url      = ""
+}
+
+model User {
+  id      Int      @id @default(sequence())
+  name    String   @unique
+  key     String
+  banned  Boolean  @default(false)
+  premium Boolean  @default(false)
+}
+
+model Provider {
+  id        Int      @id @default(sequence())
+  name      String   @unique
+  api_url   String
+  api_key   String
+  usage     Int      @default(0)
+  failures  Int      @default(0)
+  models    String[] @default([])
+}

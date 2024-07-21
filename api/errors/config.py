@@ -1,7 +1,7 @@
 import litestar
 import logging
 from litestar.exceptions import ValidationException
-from .responses import PrettyJSONResponse
+from ..responses import PrettyJSONResponse
 
 def get_exception_handlers() -> dict:
     """Returns a dictionary of exception handlers."""

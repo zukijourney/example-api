@@ -1,18 +1,16 @@
 # Example API
 
 Simple base code for creating your own AI reverse proxy.
+Uses Docker with Traefik to deploy and Litestar as the web framework.
 
 ## Dependencies
 
-- Python 3.9+
-- Any database (just make sure to configure it correctly in prisma/schema.prisma)
-- Redis database (rate limiting)
+- Docker and Docker Compose installed
 - A fucking brain
 
 ## How to Run
 
 ```bash
-pip install -r requirements.txt -U
-chmod +x run.sh
-./run.sh
+chmod +x start-api.sh
+./start-api.sh
 ```

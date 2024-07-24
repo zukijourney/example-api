@@ -1,1 +1,0 @@
-python3 -B -m run.__init__

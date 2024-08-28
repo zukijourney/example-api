@@ -32,6 +32,4 @@ RUN mkdir /etc/secrets
 
 COPY . .
 
-EXPOSE 80
-
-CMD ["/opt/venv/bin/python", "-m", "uvicorn", "--port", "80", "--host", "0.0.0.0", "app:app"]
+CMD ["/opt/venv/bin/python", "-m", "bot"]

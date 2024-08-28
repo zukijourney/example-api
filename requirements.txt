@@ -1,0 +1,14 @@
+uvicorn
+litestar
+pydantic
+pydantic-settings
+openai
+aiohttp
+httpx
+orjson
+motor
+odmantic
+asyncer
+pillow
+discord-py
+aiofiles

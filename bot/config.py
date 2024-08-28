@@ -9,8 +9,7 @@ class Settings(pydantic_settings.BaseSettings):
     Used for loading the .env config file.
     """
 
-    admin_key: str
-    cdn_url: str
+    token: str
     database_url: str
     database_name: str
     credits: pydantic.Json[typing.List[int]]

@@ -1,3 +1,3 @@
-from .pretty_json import PrettyJSONResponse
+from .json_response import JSONResponse
 
-__all__ = ["PrettyJSONResponse"]
+__all__ = ["JSONResponse"]

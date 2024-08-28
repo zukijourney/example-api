@@ -11,6 +11,6 @@ Uses Docker with Traefik to deploy and Litestar as the web framework.
 ## How to Run
 
 ```bash
-chmod +x start-api.sh
-./start-api.sh
+chmod +x deploy.sh
+./deploy.sh
 ```

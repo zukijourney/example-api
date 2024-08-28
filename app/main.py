@@ -1,34 +1,27 @@
 import litestar
-import os
-import importlib
-import typing
-from litestar.handlers.http_handlers import HTTPRouteHandler
+import asyncio
 from litestar.config.cors import CORSConfig
-from .db import init_db
-from .responses import PrettyJSONResponse
+from litestar.middleware.rate_limit import RateLimitConfig
+from .responses import JSONResponse
+from .tasks import add_credits_daily
+from .endpoints import ROUTERS
 from .errors import get_exception_handlers
 
-def load_routers() -> typing.Set[HTTPRouteHandler]:
-    """Loads routers dynamically from the routers directory and returns them."""
+def create_app() -> litestar.Litestar:
+    """Create the Litestar app."""
 
-    routers = set()
-    handlers_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "routes", "handlers"))
+    rate_limit_middleware = RateLimitConfig(rate_limit=("minute", 30), exclude_opt_key="exclude")
 
-    for root, _, files in os.walk(handlers_dir):
-        for file in files:
-            if file.endswith(".py") and not file.startswith("__"):
-                module_name = os.path.relpath(os.path.join(root, file), os.path.dirname(__file__))[:-3].replace(os.path.sep, ".")
-                module = importlib.import_module(f"app.{module_name}")
-                for obj in module.__dict__.values():
-                    if isinstance(obj, HTTPRouteHandler):
-                        routers.add(obj)
+    def start_tasks() -> None:
+        asyncio.create_task(add_credits_daily())
 
-    return routers
+    return litestar.Litestar(
+        route_handlers=ROUTERS,
+        cors_config=CORSConfig(),
+        response_class=JSONResponse,
+        exception_handlers=get_exception_handlers(),
+        middleware=[rate_limit_middleware.middleware],
+        on_startup=[start_tasks]
+    )
 
-app = litestar.Litestar(
-    route_handlers=list(load_routers()),
-    cors_config=CORSConfig(),
-    response_class=PrettyJSONResponse,
-    exception_handlers=get_exception_handlers(),
-    on_startup=[init_db]
-)
+app = create_app()

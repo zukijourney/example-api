@@ -1,54 +1,101 @@
-version: "3.8"
-
 services:
   web:
     build:
       context: .
       dockerfile: ./docker/Dockerfile.app
-    expose:
-      - 80
+    volumes:
+      - cdn-data:/cdn
+    networks:
+      - public
     depends_on:
       db:
         condition: service_healthy
-    links:
-      - db
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.fastapi.rule=Host(`your-domain.com`)"
-      - "traefik.http.routers.fastapi.tls=true"
-      - "traefik.http.routers.fastapi.tls.certresolver=letsencrypt"
-
-  db:
-    image: postgres:15-alpine
-    volumes:
-      - postgres_data_prod:/var/lib/postgresql/data/
-    ports:
-      - 5432:5432
-    expose:
-      - 5432
-    environment:
-      - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=your-password
-      - POSTGRES_DB=postgres
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-  traefik:
+      - traefik.enable=true
+      - traefik.docker.network=public
+      - traefik.http.routers.web.rule=Host(`api.example.com`)
+      - traefik.http.routers.web.tls=true
+      - traefik.http.routers.web.tls.certresolver=letsencrypt
+  
+  bot:
     build:
       context: .
-      dockerfile: ./docker/Dockerfile.traefik
-    ports:
-      - 80:80
-      - 443:443
+      dockerfile: ./docker/Dockerfile.bot
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - public
+
+  db:
+    image: mongo:latest
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "../traefik-public-certificates:/certificates"
+      - app-db-data:/data/db
+    ports:
+      - 27010:27017
+    networks:
+      - public
+    environment:
+      - MONGO_INITDB_DATABASE=db
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=example
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+  cdn:
+    image: cupcakearmy/static:latest
+    restart: unless-stopped
+    volumes:
+      - cdn-data:/srv:ro
+    networks:
+      - public
     labels:
-      - "traefik.enable=true"
+      - traefik.enable=true
+      - traefik.docker.network=public
+      - traefik.http.routers.cdn.rule=Host(`cdn.example.com`)
+      - traefik.http.routers.cdn.tls=true
+      - traefik.http.routers.cdn.tls.certresolver=letsencrypt
+
+  traefik:
+    image: traefik:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik-public-certificates:/certificates
+    ports:
+      - target: 80
+        published: 80
+        protocol: tcp
+        mode: host
+      - target: 443
+        published: 443
+        protocol: tcp
+        mode: host
+    networks:
+      - public
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=public
+    command:
+      - --entrypoints.http.address=:80
+      - --entrypoints.http.http.redirections.entrypoint.to=https
+      - --entrypoints.http.http.redirections.entrypoint.scheme=https
+      - --entrypoints.https.address=:443
+      - --providers.docker
+      - --providers.docker.exposedbydefault=false
+      - --certificatesresolvers.letsencrypt.acme.tlschallenge=true
+      - --certificatesresolvers.letsencrypt.acme.email=example@gmail.com
+      - --certificatesresolvers.letsencrypt.acme.storage=/certificates/acme.json
+      - --certificatesresolvers.letsencrypt.acme.httpchallenge=web
 
 volumes:
-  postgres_data_prod:
+  app-db-data:
+  cdn-data:
   traefik-public-certificates:
+
+networks:
+  public:
+    driver: bridge

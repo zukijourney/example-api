@@ -1,50 +1,31 @@
-import typing
+from litestar.exceptions import HTTPException
 from litestar.connection import ASGIConnection
 from litestar.handlers.base import BaseRouteHandler
-from ..db import UserManager
-from ..responses import PrettyJSONResponse
+from ..database import UserManager
 
-async def auth_guard(connection: ASGIConnection, _: BaseRouteHandler) -> typing.Optional[PrettyJSONResponse]:
-    """Checks if the user is authenticated."""
+async def auth_guard(connection: ASGIConnection, _: BaseRouteHandler) -> None:
+    """Check if the user is authenticated."""
 
     key = connection.headers.get("Authorization", "").replace("Bearer ", "")
 
     if key == "":
-        return PrettyJSONResponse(
-            content={
-                "error": {
-                    "message": "You didn't provide an API key (e.g. Authorization: Bearer sk-...).",
-                    "type": "invalid_request_error",
-                    "param": None,
-                    "code": None
-                }
-            },
+        raise HTTPException(
+            detail="You need to provide your API key in an Authorization header. Get your key at: https://discord.gg/example",
+            extra={"code": "invalid_key"},
             status_code=401
         )
 
     user = await UserManager.get_user(property="key", value=key)
 
     if not user:
-        return PrettyJSONResponse(
-            content={
-                "error": {
-                    "message": "Invalid API key.",
-                    "type": "invalid_request_error",
-                    "param": None,
-                    "code": None
-                }
-            },
+        raise HTTPException(
+            detail="The provided key was not valid. Try again with another key or get one at: https://discord.gg/example",
+            extra={"code": "invalid_key"},
             status_code=401
         )
     elif user.banned:
-        return PrettyJSONResponse(
-            content={
-                "error": {
-                    "message": "Your account has been banned.",
-                    "type": "invalid_request_error",
-                    "param": None,
-                    "code": None
-                }
-            },
+        raise HTTPException(
+            detail="Your key is banned from using the API. Do you think we made a mistake? Appeal your punishment at: https://discord.gg/example",
+            extra={"code": "banned_key"},
             status_code=403
         )

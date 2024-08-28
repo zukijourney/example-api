@@ -63,7 +63,7 @@ class OpenAI:
 
     @classmethod
     @handle_errors
-    async def chat_completion(cls, body: "Chat", user_key: str) -> typing.Union[Stream, JSONResponse]:
+    async def chat_completion(cls, body: Chat, user_key: str) -> typing.Union[Stream, JSONResponse]:
         """Create a chat completion using the OpenAI API."""
 
         user = await UserManager.get_user("key", user_key)

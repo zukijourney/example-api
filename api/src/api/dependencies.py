@@ -17,10 +17,7 @@ class AuthenticationHandler:
     async def _validate_user(key: str) -> dict:
         user = await user_manager.get_user(key=key)
         if not user:
-            raise AuthenticationError(
-                'The key you provided is invalid. '
-                f'Get your key at: {AuthenticationHandler.DISCORD_LINK}'
-            )
+            raise AuthenticationError('The key you provided is invalid.')
         
         if user['banned']:
             raise AuthenticationError(

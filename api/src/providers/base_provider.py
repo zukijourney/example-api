@@ -144,11 +144,3 @@ class BaseProvider:
     @classmethod
     async def audio_translations(cls, **_) -> None:
         raise NotImplementedError
-
-    @classmethod
-    async def text_translations(cls, **_) -> None:
-        raise NotImplementedError
-    
-    @classmethod
-    async def upscale(cls, **_) -> None:
-        raise NotImplementedError

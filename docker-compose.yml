@@ -1,101 +1,32 @@
 services:
-  web:
+  api:
     build:
-      context: .
-      dockerfile: ./docker/Dockerfile.app
+      dockerfile: Dockerfile
+      context: ./api
     volumes:
-      - cdn-data:/cdn
-    networks:
-      - public
-    depends_on:
-      db:
-        condition: service_healthy
-    labels:
-      - traefik.enable=true
-      - traefik.docker.network=public
-      - traefik.http.routers.web.rule=Host(`api.example.com`)
-      - traefik.http.routers.web.tls=true
-      - traefik.http.routers.web.tls.certresolver=letsencrypt
-  
+      - ./credits.yml:/app/credits.yml
+
   bot:
     build:
-      context: .
-      dockerfile: ./docker/Dockerfile.bot
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - public
+      dockerfile: Dockerfile
+      context: ./bot
+    volumes:
+      - ./credits.yml:/app/credits.yml
 
   db:
     image: mongo:latest
     volumes:
-      - app-db-data:/data/db
+      - mongo-data:/data/db
     ports:
-      - 27010:27017
-    networks:
-      - public
-    environment:
-      - MONGO_INITDB_DATABASE=db
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=example
-    healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-      interval: 5s
-      timeout: 5s
-      retries: 3
-      start_period: 5s
+      - 27017:27017
+    env_file:
+      - ./secrets/db.env
 
-  cdn:
-    image: cupcakearmy/static:latest
-    restart: unless-stopped
-    volumes:
-      - cdn-data:/srv:ro
-    networks:
-      - public
-    labels:
-      - traefik.enable=true
-      - traefik.docker.network=public
-      - traefik.http.routers.cdn.rule=Host(`cdn.example.com`)
-      - traefik.http.routers.cdn.tls=true
-      - traefik.http.routers.cdn.tls.certresolver=letsencrypt
-
-  traefik:
-    image: traefik:latest
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - traefik-public-certificates:/certificates
-    ports:
-      - target: 80
-        published: 80
-        protocol: tcp
-        mode: host
-      - target: 443
-        published: 443
-        protocol: tcp
-        mode: host
-    networks:
-      - public
-    labels:
-      - traefik.enable=true
-      - traefik.docker.network=public
-    command:
-      - --entrypoints.http.address=:80
-      - --entrypoints.http.http.redirections.entrypoint.to=https
-      - --entrypoints.http.http.redirections.entrypoint.scheme=https
-      - --entrypoints.https.address=:443
-      - --providers.docker
-      - --providers.docker.exposedbydefault=false
-      - --certificatesresolvers.letsencrypt.acme.tlschallenge=true
-      - --certificatesresolvers.letsencrypt.acme.email=example@gmail.com
-      - --certificatesresolvers.letsencrypt.acme.storage=/certificates/acme.json
-      - --certificatesresolvers.letsencrypt.acme.httpchallenge=web
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate run
+    env_file: 
+      - ./secrets/cloudflared.env
 
 volumes:
-  app-db-data:
-  cdn-data:
-  traefik-public-certificates:
-
-networks:
-  public:
-    driver: bridge
+  mongo-data:

@@ -1,12 +1,14 @@
 # Example API
 
 Simple base code for creating your own AI reverse proxy.
-Uses Docker with Traefik to deploy and Litestar as the web framework.
+Uses Docker with Cloudflare Tunnels to deploy and FastAPI as the web framework.
+
+Heaviily inspired by [full-stack-fastapi-template](https://github.com/fastapi/full-stack-fastapi-template).
 
 ## Dependencies
 
-- Docker and Docker Compose installed
-- A fucking brain
+- Docker
+- Docker Compose
 
 ## How to Run
 

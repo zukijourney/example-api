@@ -1,7 +1,7 @@
 FROM ghcr.io/astral-sh/uv:latest AS uv
 
 # Builder stage
-FROM python:3.10-alpine AS builder
+FROM python:3.11-alpine AS builder
 
 RUN apk update && apk upgrade && rm -rf /var/cache/apk/*
 RUN apk add build-base
@@ -21,7 +21,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     /opt/uv pip install -r pyproject.toml
 
 # Final stage
-FROM python:3.10-alpine AS final
+FROM python:3.11-alpine AS final
 
 WORKDIR /app
 
